@@ -281,17 +281,60 @@
                 <a href="#survey-visual-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
     
-             <div role="main" class="ui-content">
+             <div data-role="main" class="ui-content">
                 <p>Wait one minute...</p>
                 
                 <ul data-role="listview" data-inset="true">
                     <li data-role="list-divider">What do you see?</li>
-                    <li>
-                           Trees
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_trees" href="#" >
+                           Trees &amp; Shrubs
+                           <span class="ui-li-count">0</span>
+                        </a>
                     </li>
-                    <li>
-                          Grass
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_herbs" href="#" >
+                           Plants &amp; Flowers
+                           <span class="ui-li-count">0</span>
+                        </a>
                     </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_lawns" href="#" >
+                           Lawns &amp; Short Grass
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_water_still" href="#" >
+                           Water - still
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_water_flowing" href="#" >
+                           Water - flowing
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_sea" href="#" >
+                           Sea
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_buildings" href="#" >
+                           Buildings &amp; Walls
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a class="sy-metric"  data-sy-metric="visual_paving" href="#" >
+                           Paving &amp; Tarmac
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    
                 </ul>
                 
              </div>
@@ -338,5 +381,20 @@
         </div>
        
 
+         <!-- strength popup - used on multiple pages -->
+         <div data-role="popup" id="strength-popup" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+
+                 <a href="#" class="ui-btn ui-corner-all" data-sy-strength="2" >++ Positive</a>
+                 <a href="#" class="ui-btn ui-corner-all" data-sy-strength="1" >+Positive</a> 
+                 
+                 <a href="#" class="ui-btn ui-corner-all" data-sy-strength="0" >0 Neutral</a> 
+                 
+                 <a href="#" class="ui-btn ui-corner-all" data-sy-strength="-1" >- Negative</a>
+                 <a href="#" class="ui-btn ui-corner-all" data-sy-strength="-2" >-- Negative</a>
+                 
+         </div>
+
+
+        
     </body>
 </html>

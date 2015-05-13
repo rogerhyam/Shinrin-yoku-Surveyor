@@ -12,6 +12,33 @@ function ShinrinYokuSurvey(){
 }
 var sysurvey = null;
 
+/*
+ * W H O L E - D O C U M E N T 
+ */
+ $( function() {
+   
+     // Instantiate the strength popup on DOMReady, and enhance its contents
+     // it is used across multiple pages
+     $( "#strength-popup" ).enhanceWithin().popup();
+     
+     // listen for when the popup appear
+     $( "#strength-popup" ).on('popupbeforeposition', function(event, ui){
+        console.log(event);
+        console.log(ui); 
+     });
+     
+     // listen for button clicks on strength popup
+     $('div#strength-popup a').on('click', function(){
+         var sy_metric = $( "#strength-popup" ).data('sy-metric-anchor').data('sy-metric');
+         var sy_val = $(this).data('sy-strength')
+         sysurvey[sy_metric] = sy_val;
+         console.log(sysurvey);
+         $(this).parent().popup('close');
+     });
+     
+     
+ });
+
 
 /*
  *  H O M E - P A G E 
@@ -102,7 +129,7 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
          var d = new Date();
          var session = sysurvey.groundings[sysurvey.groundings.length - 1];
          session.finished = d.getTime();
-         var duration = session.finished - session.start;
+         var duration = session.finished - session.started;
          
          // FIXME: check the breathing time was reasonable
          console.log(sysurvey.groundings);
@@ -127,6 +154,25 @@ $(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
     var buttons = $('#survey-grounding div.ui-content a');
     buttons.addClass('ui-disabled');
     $(buttons[0]).removeClass('ui-disabled');
+
+});
+
+/*
+ * V I S U A L - P A G E 
+ */
+ 
+// Triggered when the page has been created, but before enhancement is complete
+// good to add listeners
+$(document).on('pagecreate', '#survey-visual', function(e, data) {
+
+     console.log("pagecreate #survey-visual");
+     
+     // listen for button clicks
+     $('div#survey-visual a.sy-metric').on('click', function(){
+         $( "#strength-popup" ).data('sy-metric-anchor', $(this));
+         $( "#strength-popup" ).popup('open');
+     });
+     
 
 });
 
