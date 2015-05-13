@@ -9,6 +9,7 @@ function ShinrinYokuSurvey(){
     this.stage = 0;
     this.complete = false;
     this.groundings = new Array();
+    this.tags = new Array();
 }
 var sysurvey = null;
 
@@ -16,6 +17,12 @@ var sysurvey = null;
  * W H O L E - D O C U M E N T 
  */
  $( function() {
+   
+     // listen for popup calls across multiple pages
+     $('a.sy-metric').on('click', function(){
+         $( "#strength-popup" ).data('sy-metric-anchor', $(this));
+         $( "#strength-popup" ).popup('open');
+     });
    
      // Instantiate the strength popup on DOMReady, and enhance its contents
      // it is used across multiple pages
@@ -29,13 +36,40 @@ var sysurvey = null;
      
      // listen for button clicks on strength popup
      $('div#strength-popup a').on('click', function(){
-         var sy_metric = $( "#strength-popup" ).data('sy-metric-anchor').data('sy-metric');
-         var sy_val = $(this).data('sy-strength')
+         var anchor =  $( "#strength-popup" ).data('sy-metric-anchor');     
+         var sy_metric = anchor.data('sy-metric');
+         var sy_val = $(this).data('sy-strength');
          sysurvey[sy_metric] = sy_val;
+         
+         // update the view
+         anchor.parent().find('.ui-li-count').html(sy_val);
+         
+         // remove any flagging classes
+         anchor.parent().removeClass (function (index, css) {
+             return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
+         });
+         
+         anchor.parent().addClass('sy-strength-colour-' + sy_val);
+         
          console.log(sysurvey);
          $(this).parent().popup('close');
+         
      });
      
+     // listen for stage save buttons
+     $('a.sy-save-stage').on('click', function(){
+         console.log('save clicked');
+         sysurvey.stage++;
+         $("body").pagecontainer("change", "#survey", {
+                  transition: 'slide',
+                  reverse: true,
+              });
+     });
+     
+     // listen for stage cancel button
+     $('a.sy-cancel-stage').on('click', function(){
+         console.log('cancel clicked');
+     });
      
  });
 
@@ -83,9 +117,10 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
     
     // check we have enabled the correct buttons
     // disable all the button and only enable the one we are on
+    /*
     var stages = $('#systage-list a');
     stages.addClass('ui-disabled');
-    
+ 
     if(sysurvey.stage >= stages.length){
         // we are past the end of the stages so enable the save button
         $('#sysurvey-complete').removeClass('ui-disabled');
@@ -95,7 +130,7 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
         // disable the save
         $('#sysurvey-complete').addClass('ui-disabled');
     }
-    
+    */
     
 });
 
@@ -167,14 +202,43 @@ $(document).on('pagecreate', '#survey-visual', function(e, data) {
 
      console.log("pagecreate #survey-visual");
      
-     // listen for button clicks
-     $('div#survey-visual a.sy-metric').on('click', function(){
-         $( "#strength-popup" ).data('sy-metric-anchor', $(this));
-         $( "#strength-popup" ).popup('open');
-     });
-     
+});
+
+/*
+ * E M O T I O N A L - P A G E 
+ */
+$(document).on('pagecreate', '#survey-emotional', function(e, data) {
+
+    $('div#survey-emotional div.ui-content a').on('click', function(){
+        
+        // have we ticked three alread? If so complain.
+        var checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
+        
+        // is it already clicked
+        if($(this).data('sy-tag-on') == 'true'){
+            $(this).data('sy-tag-on', 'false');
+            $(this).buttonMarkup({ icon: "" });
+        }else{
+            if(checked.length >= 3){
+                alert('too many checked');
+                return;
+            }
+            $(this).data('sy-tag-on', 'true');
+            $(this).buttonMarkup({ icon: "check", iconpos: "right"});
+        }
+        
+        // get the newly checked list
+        sysurvey.tags = new Array();
+        checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
+        checked.each(function(i,a){
+           sysurvey.tags.push($(a).data('sy-val'));
+        });
+        console.log(sysurvey);
+
+    });
 
 });
+ 
 
 
 

@@ -1,3 +1,29 @@
 div.ui-footer a.footer-button{
     float:right;
 }
+
+li.sy-strength-colour-0{
+/*    border: solid red 1px; */
+}
+
+
+li.ui-li-has-count.sy-strength-colour-2 a{
+     background-color: rgba(162, 255, 153, 0.4);
+}
+
+li.ui-li-has-count.sy-strength-colour-1 a{
+     background-color: rgba(235, 255, 153, 0.4);
+}
+
+li.ui-li-has-count.sy-strength-colour-0 a{
+     background-color: rgba(204, 204, 204, 0.12);
+}
+
+li.ui-li-has-count.sy-strength-colour--1 a{
+     background-color: rgba(255, 175, 153, 0.4);
+}
+
+li.ui-li-has-count.sy-strength-colour--2 a{
+     background-color: rgba(255, 122, 122, 0.51);
+}
+
