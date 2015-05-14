@@ -236,12 +236,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#survey-holding" data-transition="slide">
-                            <h2>4. Holding</h2>
-                            <p>Making contact with the environment.</p>
-                        </a>
-                    </li>
-                    <li>
                         <a href="#survey-emotional" data-transition="slide">
                             <h2>5. Emotional</h2>
                             <p>How does it make you feel?</p>
@@ -282,7 +276,8 @@
             </div>
     
              <div data-role="main" class="ui-content">
-                <p>Wait one minute...</p>
+                 
+                <button class="sy-sampling-minute-button ui-btn ui-corner-all ui-btn-a ui-icon-clock ui-btn-icon-right" data-on-text="Look..." >A Minute Looking</button>
                 
                 <ul data-role="listview" data-inset="true">
                     <li data-role="list-divider">What did you see?</li>
@@ -379,7 +374,8 @@
             </div>
     
              <div data-role="main" class="ui-content">
-                <p>Wait one minute...</p>
+    
+                <button class="sy-sampling-minute-button ui-btn ui-corner-all ui-btn-a ui-icon-clock ui-btn-icon-right" data-on-text="Listen..." >A Minute Listening</button>
                 
                 <ul data-role="listview" data-inset="true">
                     <li data-role="list-divider">What did you hear?</li>
@@ -504,6 +500,60 @@
              </div>
 
         </div>
+        
+         <!-- Survey overall Page -->
+        <div data-role="page" id="survey-overall">
+
+            <div data-role="header">
+                <a href="#survey" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Survey</a>
+                <h1>Overall</h1>
+                <a href="#survey-overall-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
+            </div>
+
+             <div data-role="main" class="ui-content">
+                
+                <p>Pick up the three words that best sum up how you feel about the place</p>
+
+                <ul data-role="listview" data-inset="true" >
+                    
+                    <li class="ui-field-contain">
+                        <select name="select-choice-1" id="select-choice-1">
+                            <option value="0">Add Rating (optional)</option>
+                            <option value="1">&#x2605;&#x2606;&#x2606;&#x2606;&#x2606;</option>
+                            <option value="2">&#x2605;&#x2605;&#x2606;&#x2606;&#x2606;</option>
+                            <option value="3">&#x2605;&#x2605;&#x2605;&#x2606;&#x2606;</option>
+                            <option value="4">&#x2605;&#x2605;&#x2605;&#x2605;&#x2606;</option>
+                            <option value="5">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</option>
+                        </select>
+                    </li>
+                    
+                    <li>
+                        <button class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-right" >Add Photo (optional)</button>
+                    </li>
+                    
+                    <li class="ui-field-contain" >
+                         <label for="textarea2">Comments (optional):</label>
+                         <textarea cols="40" name="textarea2" id="textarea2"></textarea>
+                    </li>
+                     
+                </ul>
+
+             </div>
+
+             <div data-role="footer" data-position="fixed" >
+                 <a href="#" class="sy-save-stage ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-check">Save</a>
+                 <a href="#" data-rel="back" data-direction="reverse" class="sy-cancel-stage ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-back">Cancel</a>
+             </div>
+
+             <div data-role="popup" id="survey-overall-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Auditory Help</h3>
+                 <p>Listen...</p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+             </div>
+
+        </div>
+        
+        
        
 
          <!-- strength popup - used on multiple pages -->

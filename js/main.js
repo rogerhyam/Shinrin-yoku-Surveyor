@@ -71,6 +71,38 @@ var sysurvey = null;
          console.log('cancel clicked');
      });
      
+     // listen for minute timout buttons
+     $('button.sy-sampling-minute-button').on('click', function(){
+         
+         var button = $(this);
+         var page = button.parents('div[data-role="page"]');
+         
+         // change the button text
+         button.html(button.data('on-text'));
+         
+         // start a timer
+         var timer = setTimeout(function(button, page){
+             
+             // FIXME - VIBRATE PHONE
+             
+             // change the button txt and disable it
+             button.html('Minute complete');
+             button.addClass('ui-disabled');
+             
+             // enable everyting else on the page
+             $('a.sy-metric', page).removeClass('ui-disabled');
+
+             // remove the timer from the page now
+             page.data('sy-timer', null);
+             
+         },1000, button, page);
+         
+         // keep a reference to the timer attached to the page incase we move away
+         page.data('sy-timer', timer);
+         
+         console.log($(this));
+     });
+     
  });
 
 
@@ -199,10 +231,28 @@ $(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
 // Triggered when the page has been created, but before enhancement is complete
 // good to add listeners
 $(document).on('pagecreate', '#survey-visual', function(e, data) {
-
-     console.log("pagecreate #survey-visual");
-     
+     //console.log("pagecreate #survey-visual");
 });
+
+// good to set state
+$(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
+
+    // disable buttons till after minute has run
+    $('div#survey-visual a.sy-metric').addClass('ui-disabled');
+    
+});
+
+/*
+ * A U D I T O R Y - P A G E 
+ */
+// good to set state
+$(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
+    
+    // disable buttons till after minute has run
+    $('div#survey-auditory a.sy-metric').addClass('ui-disabled');
+
+});
+ 
 
 /*
  * E M O T I O N A L - P A G E 
