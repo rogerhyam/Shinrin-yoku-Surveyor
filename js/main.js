@@ -6,12 +6,78 @@
  */
  
 function ShinrinYokuSurvey(){
+    
+    // give it a uuid
+    this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+    
     this.stage = 0;
     this.complete = false;
     this.groundings = new Array();
     this.tags = new Array();
+    this.geolocation = new Object();
+    
+    // tag the creation time
+    var now = new Date();
+    this.started = now.getTime();
+
+    // find the location
+    navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+    
 }
 var sysurvey = null;
+
+
+function onGeoSuccess(position){
+    
+    console.log(position);
+
+    // if survey is null they have given up
+    if(!sysurvey) return;
+    
+    sysurvey.geolocation.position = position;
+    
+    // update the interface with the location
+    if(position.coords.latitude > 0){
+        var lat = position.coords.latitude.toFixed(6) + '&deg; North';
+    }else{
+        var lat = Math.abs(position.coords.latitude).toFixed(6) + '&deg; South';
+    }
+    
+    if(position.coords.longitude > 0){
+        var lon = Math.abs(position.coords.longitude).toFixed(6) + '&deg; East';
+    }else{
+        var lon = Math.abs(position.coords.longitude).toFixed(6) + '&deg; West';
+    }
+    
+    $('#sy-geolocation-auto p').html(lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)');
+    $('#sy-geolocation-auto').show();
+    $('#sy-geolocation-manual').hide();
+}
+
+function onGeoError(error){
+    console.log(error);
+    sysurvey.geolocation.error = error;
+    $('#sy-geolocation-auto').hide();
+    $('#sy-geolocation-manual').show();
+}
+
+function getBox(box_name){
+    var box = window.localStorage.getItem(box_name);
+    if(!box){
+        box = new Array();
+    }else{
+        box = JSON.parse(box);
+    }
+    return box;
+}
+
+function saveBox(box_name, box){
+    window.localStorage.setItem(box_name, JSON.stringify(box));
+}
+
 
 /*
  * W H O L E - D O C U M E N T 
@@ -128,6 +194,10 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
     // survey - we need to reset it
     // FIXME - WE SHOULD DO SOME CHECKING AND WARNING HERE - MAYBE BEFORE PAGE TRANSITION STARTS.
     sysurvey = null;
+    
+    var outbox = getBox('outbox');
+    $('#sy-outbox-count').html(outbox.length);
+    
 });
 
 /*
@@ -138,13 +208,52 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
  // good to add listeners
  $(document).on('pagecreate', '#survey', function(e, data) {
     
+    $('#sysurvey-complete').on('click', function(){
+       
+        // save the survey - there should be no need for validation
+        var now = new Date();
+        sysurvey.completed = now.getTime();
+        sysurvey.timezoneOffset = now.getTimezoneOffset();
+        // not sure if daylight saving is always included...
+        
+        // save the thing itself
+        window.localStorage.setItem(sysurvey.id, JSON.stringify(sysurvey));
+        
+        // add it to the outbox
+        var outbox = getBox('outbox');
+        outbox.push(
+            {
+                'id': sysurvey.id,
+                'name': 'fixme',
+                'date': sysurvey.started
+            });
+        saveBox('outbox', outbox);
+        
+        sysurvey = null;
+        $("body").pagecontainer("change", "#home", {
+                 transition: 'slide',
+                 reverse: true,
+             });
+        
+        console.log(sysurvey);
+        
+       
+    });
+    
  });
 
 // Triggered on the "to" page, before transition animation starts
 $(document).on('pagebeforeshow', '#survey', function(e, data) {
     
+    
     if(sysurvey == null){
         sysurvey = new ShinrinYokuSurvey();
+    }
+    
+    // also create new survey if it is older than 30 minutes.
+    var now = new Date();
+    if((now - sysurvey.started) > (30*60*1000)){
+         sysurvey = new ShinrinYokuSurvey();
     }
     
     // check we have enabled the correct buttons
@@ -240,6 +349,12 @@ $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
     // disable buttons till after minute has run
     $('div#survey-visual a.sy-metric').addClass('ui-disabled');
     
+    // fixme - reset colours and numbers
+    
+    // enable the timer button
+    var button = $('div#survey-visual button.sy-sampling-minute-button');
+    button.removeClass('ui-disabled');
+    button.html(button.data('ready-text'));
 });
 
 /*
@@ -250,6 +365,13 @@ $(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
     
     // disable buttons till after minute has run
     $('div#survey-auditory a.sy-metric').addClass('ui-disabled');
+    
+    // fixme - reset colours - and numbers
+    
+    // enable the timer button
+    var button = $('div#survey-auditory button.sy-sampling-minute-button');
+    button.removeClass('ui-disabled');
+    button.html(button.data('ready-text'));
 
 });
  
@@ -290,9 +412,81 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
 });
  
 
+/*
+ * O U T B O X - P A G E
+ */
+
+// good to add listeners
+$(document).on('pagecreate', '#outbox', function(e, data) {
+    
+    $('#delete-confirm-button').on('click', function(){
+        
+        var survey_id = $(this).data('sy-survey-delete-survey-id');
+        
+        // remove the survey from storage
+        window.localStorage.removeItem(survey_id);
+        
+        // remove it from the outbox
+        var outbox = getBox('outbox');
+        for(i=0; i < outbox.length; i++){
+            if(outbox[i].id == survey_id){
+                outbox.splice(i, 1);
+                break;
+            }
+        }
+        saveBox('outbox', outbox);
+        
+        // remove the list item
+        $('#'+ survey_id).hide();
+        
+    });
+    
+});
+
+// good to set state
+$(document).on('pagebeforeshow', '#outbox', function(e, data) {
+    
+    // clear the list
+    $('div#outbox div.ui-content ul').empty();
+    
+    var outbox = getBox('outbox');
+    for(i = 0 ; i< outbox.length; i++){
+        
+        var survey = outbox[i];
+        console.log(survey);
+
+        var li = $('<li></li>');
+        li.attr('id', survey.id);
+
+        var a1 = $('<a href="#"></a>');
+        li.append(a1);
+                
+        var h3 = $('<h3></h3>');
+        h3.html(survey.name);
+        a1.append(h3);
+        
+        var p = $('<p></p>');
+        var d = new Date(survey.date);
+        p.html(d.toString());
+        a1.append(p);
+                
+        var a2 = $('<a href="#" class="sy-survey-delete" ></a>');
+        a2.data('sy-survey-id', survey.id);
+        a2.on('click', function(){
+            // copy the id of the survey they clicked on into the dialogue
+            $('#delete-confirm-button').data('sy-survey-delete-survey-id', $(this).data('sy-survey-id'));
+            $('#delete-confirm').popup('open'); // launch the dialogue
+        });
+        
+        li.append(a2);
+        
+        $('div#outbox div.ui-content ul').append(li).trigger('create');
+    }
+    $('div#outbox div.ui-content ul').listview().listview('refresh');
+    console.log($('div#outbox div.ui-content ul'));
 
 
-
+});
 
 
 
