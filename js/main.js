@@ -102,6 +102,7 @@ function saveBox(box_name, box){
      
      // listen for button clicks on strength popup
      $('div#strength-popup a').on('click', function(){
+         
          var anchor =  $( "#strength-popup" ).data('sy-metric-anchor');     
          var sy_metric = anchor.data('sy-metric');
          var sy_val = $(this).data('sy-strength');
@@ -348,8 +349,14 @@ $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
 
     // disable buttons till after minute has run
     $('div#survey-visual a.sy-metric').addClass('ui-disabled');
+        
+    // reset colours
+    $('div#survey-visual a.sy-metric').parent().removeClass(function (index, css){
+        return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
+    });
     
-    // fixme - reset colours and numbers
+    // reset numbers
+    $('div#survey-visual a.sy-metric span.ui-li-count').html('0');
     
     // enable the timer button
     var button = $('div#survey-visual button.sy-sampling-minute-button');
@@ -366,7 +373,13 @@ $(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
     // disable buttons till after minute has run
     $('div#survey-auditory a.sy-metric').addClass('ui-disabled');
     
-    // fixme - reset colours - and numbers
+    // reset colours
+    $('div#survey-auditory a.sy-metric').parent().removeClass(function (index, css){
+        return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
+    });
+    
+    // reset numbers
+    $('div#survey-auditory a.sy-metric span.ui-li-count').html('0');
     
     // enable the timer button
     var button = $('div#survey-auditory button.sy-sampling-minute-button');
@@ -383,20 +396,25 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
 
     $('div#survey-emotional div.ui-content a').on('click', function(){
         
-        // have we ticked three alread? If so complain.
-        var checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
         
-        // is it already clicked
+        
+        
+        // is it already clicked unclick it
         if($(this).data('sy-tag-on') == 'true'){
             $(this).data('sy-tag-on', 'false');
             $(this).buttonMarkup({ icon: "" });
         }else{
-            if(checked.length >= 3){
-                alert('too many checked');
-                return;
-            }
+            // click it
             $(this).data('sy-tag-on', 'true');
             $(this).buttonMarkup({ icon: "check", iconpos: "right"});
+        }
+        
+        // if three are checked disable the rest
+        var checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
+        if(checked.length >= 3){
+            $('div#survey-emotional div.ui-content a').not('.ui-icon-check').addClass('ui-disabled');
+        }else{
+            $('div#survey-emotional div.ui-content a').removeClass('ui-disabled');
         }
         
         // get the newly checked list
