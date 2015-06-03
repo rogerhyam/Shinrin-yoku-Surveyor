@@ -1,10 +1,12 @@
 
 // http://www.w3schools.com/jquerymobile/jquerymobile_ref_events.asp
 
+// set up a namespace so we can have non-coliding functions
+var shinrinyoku = {};
+
 /*
  * The survey object
  */
- 
 function ShinrinYokuSurvey(){
     
     // give it a uuid
@@ -24,13 +26,12 @@ function ShinrinYokuSurvey(){
     this.started = now.getTime();
 
     // find the location
-    navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+    navigator.geolocation.getCurrentPosition(shinrinyoku.onGeoSuccess, shinrinyoku.onGeoError);
     
 }
 var sysurvey = null;
 
-
-function onGeoSuccess(position){
+shinrinyoku.onGeoSuccess = function(position){
     
     console.log(position);
 
@@ -57,14 +58,14 @@ function onGeoSuccess(position){
     $('#sy-geolocation-manual').hide();
 }
 
-function onGeoError(error){
+shinrinyoku.onGeoError = function(error){
     console.log(error);
     sysurvey.geolocation.error = error;
     $('#sy-geolocation-auto').hide();
     $('#sy-geolocation-manual').show();
 }
 
-function getBox(box_name){
+shinrinyoku.getBox = function(box_name){
     var box = window.localStorage.getItem(box_name);
     if(!box){
         box = new Array();
@@ -74,8 +75,41 @@ function getBox(box_name){
     return box;
 }
 
-function saveBox(box_name, box){
+shinrinyoku.saveBox = function(box_name, box){
     window.localStorage.setItem(box_name, JSON.stringify(box));
+}
+
+shinrinyoku.submit = function(survey_ids){
+    
+    var history = shinrinyoku.getBox('history');
+    var outbox = shinrinyoku.getBox('outbox');
+    
+    for(var i = 0; i < survey_ids.length; i++){
+        
+        var survey_id = survey_ids[i];
+        
+        
+        // do a call to submit this entry
+        // FIXME
+        
+        // if successful
+        // move from the out to history boxes
+        for(var j=0; j < outbox.length; j++){
+            if(outbox[j].id == survey_id){
+                history.push(outbox[i]);
+                outbox.splice(j, 1);
+                break;
+            }
+        }
+        
+        // remove the list item
+        $('#'+ survey_id).hide();
+             
+    }
+    
+    shinrinyoku.saveBox('history', history);
+    shinrinyoku.saveBox('outbox', outbox);
+    
 }
 
 
@@ -124,6 +158,7 @@ function saveBox(box_name, box){
      });
      
      // listen for stage save buttons
+     /*
      $('a.sy-save-stage').on('click', function(){
          console.log('save clicked');
          sysurvey.stage++;
@@ -132,6 +167,7 @@ function saveBox(box_name, box){
                   reverse: true,
               });
      });
+     */
      
      // listen for stage cancel button
      $('a.sy-cancel-stage').on('click', function(){
@@ -196,8 +232,11 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
     // FIXME - WE SHOULD DO SOME CHECKING AND WARNING HERE - MAYBE BEFORE PAGE TRANSITION STARTS.
     sysurvey = null;
     
-    var outbox = getBox('outbox');
+    var outbox = shinrinyoku.getBox('outbox');
     $('#sy-outbox-count').html(outbox.length);
+    
+    var history = shinrinyoku.getBox('history');
+    $('#sy-history-count').html(history.length);
     
 });
 
@@ -218,17 +257,12 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
         // not sure if daylight saving is always included...
         
         // save the thing itself
-        window.localStorage.setItem(sysurvey.id, JSON.stringify(sysurvey));
+        //window.localStorage.setItem(sysurvey.id, JSON.stringify(sysurvey));
         
         // add it to the outbox
-        var outbox = getBox('outbox');
-        outbox.push(
-            {
-                'id': sysurvey.id,
-                'name': 'fixme',
-                'date': sysurvey.started
-            });
-        saveBox('outbox', outbox);
+        var outbox = shinrinyoku.getBox('outbox');
+        outbox.push(sysurvey);
+        shinrinyoku.saveBox('outbox', outbox);
         
         sysurvey = null;
         $("body").pagecontainer("change", "#home", {
@@ -395,10 +429,7 @@ $(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
 $(document).on('pagecreate', '#survey-emotional', function(e, data) {
 
     $('div#survey-emotional div.ui-content a').on('click', function(){
-        
-        
-        
-        
+    
         // is it already clicked unclick it
         if($(this).data('sy-tag-on') == 'true'){
             $(this).data('sy-tag-on', 'false');
@@ -437,6 +468,18 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
 // good to add listeners
 $(document).on('pagecreate', '#outbox', function(e, data) {
     
+    // submit all button
+    $('#submit-all').on('click', function(){
+        
+        var outbox = shinrinyoku.getBox('outbox');
+        var survey_ids = [];
+        for(i = 0 ; i< outbox.length; i++){
+            survey_ids.push(outbox[i].id);
+        }
+        shinrinyoku.submit(survey_ids);
+    });
+    
+    // confirm the delete of a survey in the popup
     $('#delete-confirm-button').on('click', function(){
         
         var survey_id = $(this).data('sy-survey-delete-survey-id');
@@ -445,14 +488,14 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
         window.localStorage.removeItem(survey_id);
         
         // remove it from the outbox
-        var outbox = getBox('outbox');
+        var outbox = shinrinyoku.getBox('outbox');
         for(i=0; i < outbox.length; i++){
             if(outbox[i].id == survey_id){
                 outbox.splice(i, 1);
                 break;
             }
         }
-        saveBox('outbox', outbox);
+        shinrinyoku.saveBox('outbox', outbox);
         
         // remove the list item
         $('#'+ survey_id).hide();
@@ -467,7 +510,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
     // clear the list
     $('div#outbox div.ui-content ul').empty();
     
-    var outbox = getBox('outbox');
+    var outbox = shinrinyoku.getBox('outbox');
     for(i = 0 ; i< outbox.length; i++){
         
         var survey = outbox[i];
@@ -478,18 +521,28 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 
         var a1 = $('<a href="#"></a>');
         li.append(a1);
+        a1.data('sy-survey-id', survey.id);
                 
         var h3 = $('<h3></h3>');
-        h3.html(survey.name);
+        if(survey.name)h3.html(survey.name);
+        else h3.html('~ no name ~');
+        
         a1.append(h3);
         
         var p = $('<p></p>');
-        var d = new Date(survey.date);
+        var d = new Date(survey.started);
         p.html(d.toString());
         a1.append(p);
-                
+        
         var a2 = $('<a href="#" class="sy-survey-delete" ></a>');
         a2.data('sy-survey-id', survey.id);
+        
+        // listen for submit single item request
+        a1.on('click', function(){        
+           shinrinyoku.submit([ $(this).data('sy-survey-id') ]);
+        });
+        
+        // listen for delete request
         a2.on('click', function(){
             // copy the id of the survey they clicked on into the dialogue
             $('#delete-confirm-button').data('sy-survey-delete-survey-id', $(this).data('sy-survey-id'));
@@ -506,6 +559,56 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 
 });
 
+
+/*
+ * H I S T O R Y - P A G E
+ */
+ // good to set state
+ $(document).on('pagebeforeshow', '#history', function(e, data) {
+
+     // clear the list
+     $('div#history div.ui-content ul').empty();
+
+     var history = shinrinyoku.getBox('history');
+     
+     for(i = 0 ; i< history.length; i++){
+
+         var survey = history[i];
+       
+         console.log(survey);
+
+         var li = $('<li></li>');
+         li.attr('id', survey.id);
+         li.attr('data-icon', 'action');
+
+         var a1 = $('<a href="#"></a>');
+         li.append(a1);
+         a1.data('sy-survey-id', survey.id);
+         
+         
+
+         var h3 = $('<h3></h3>');
+         if(survey.name) h3.html(survey.name);
+         else h3.html('banana');
+         a1.append(h3);
+
+         var p = $('<p></p>');
+         var d = new Date(survey.started);
+         p.html(d.toString());
+         a1.append(p);
+
+         // listen for view item request
+         a1.on('click', function(){        
+            shinrinyoku.submit([ $(this).data('sy-survey-id') ]);
+         });
+
+         $('div#history div.ui-content ul').append(li).trigger('create');
+     }
+     $('div#history div.ui-content ul').listview().listview('refresh');
+     console.log($('div#history div.ui-content ul'));
+
+
+ });
 
 
 
