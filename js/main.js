@@ -3,9 +3,11 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
+shinrinyoku.developer_mode = false;
+shinrinyoku.submit_uri = 'http://shinrinyoku.rbge.info/submit.php';
 
 /*
- * The survey object
+ * The survey object class
  */
 function ShinrinYokuSurvey(){
     
@@ -256,9 +258,6 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
         sysurvey.timezoneOffset = now.getTimezoneOffset();
         // not sure if daylight saving is always included...
         
-        // save the thing itself
-        //window.localStorage.setItem(sysurvey.id, JSON.stringify(sysurvey));
-        
         // add it to the outbox
         var outbox = shinrinyoku.getBox('outbox');
         outbox.push(sysurvey);
@@ -310,6 +309,7 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
     
 });
 
+
 /*
  * G R O U N D I N G - P A G E 
  */
@@ -354,6 +354,19 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
              });
 
      });
+     
+     // listen to the back button to validate etc
+     $('#survey-grounding-done').on('click', function(){
+
+         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+         sysurvey.stage++;
+         console.log('grounding done');
+         $("body").pagecontainer("change", "#survey", {
+             transition: 'slide',
+             reverse: true,
+         });
+
+     });
     
      
  });
@@ -375,6 +388,20 @@ $(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
 // Triggered when the page has been created, but before enhancement is complete
 // good to add listeners
 $(document).on('pagecreate', '#survey-visual', function(e, data) {
+    
+    // listen to the back button to validate etc
+    $('#survey-visual-done').on('click', function(){
+        
+        // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+        sysurvey.stage++;
+        console.log('visual done');
+        $("body").pagecontainer("change", "#survey", {
+            transition: 'slide',
+            reverse: true,
+        });
+        
+    });
+    
      //console.log("pagecreate #survey-visual");
 });
 
@@ -401,6 +428,24 @@ $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
 /*
  * A U D I T O R Y - P A G E 
  */
+
+ // good to add listeners
+ $(document).on('pagecreate', '#survey-auditory', function(e, data) {
+    
+     // listen to the back button to validate etc
+     $('#survey-auditory-done').on('click', function(){
+
+         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+         sysurvey.stage++;
+         console.log('auditory done');
+         $("body").pagecontainer("change", "#survey", {
+             transition: 'slide',
+             direction: 'reverse'
+         });
+
+     });
+});
+
 // good to set state
 $(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
     
@@ -457,8 +502,43 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
         console.log(sysurvey);
 
     });
+    
+    // listen to the back button to validate etc
+    $('#survey-emotional-done').on('click', function(){
+
+        // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+        sysurvey.stage++;
+        console.log('emotional done');
+        $("body").pagecontainer("change", "#survey", {
+            transition: 'slide',
+            reverse: true,
+        });
+
+    });
 
 });
+
+/*
+ * O V E R A L L - P A G E
+ */
+ // good to add listeners
+ $(document).on('pagecreate', '#survey-overall', function(e, data) {
+     
+     // listen to the back button to validate etc
+     $('#survey-overall-done').on('click', function(){
+
+         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+         sysurvey.stage++;
+         console.log('overall done');
+         $("body").pagecontainer("change", "#survey", {
+             transition: 'slide',
+             reverse: true,
+         });
+
+     });
+     
+ });
+ 
  
 
 /*
@@ -555,6 +635,16 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
     }
     $('div#outbox div.ui-content ul').listview().listview('refresh');
     console.log($('div#outbox div.ui-content ul'));
+    
+    // we can only empty a history if we have one
+    if(outbox.length > 0){
+        $('#submit-all').removeClass('ui-disabled');
+    }else{
+        $('#submit-all').addClass('ui-disabled');
+         var li = $('<li>Outbox is empty.</li>');
+         $('div#outbox div.ui-content ul').append(li).trigger('create');
+         $('div#outbox div.ui-content ul').listview().listview('refresh');
+    }
 
 
 });
@@ -563,6 +653,17 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 /*
  * H I S T O R Y - P A G E
  */
+ // good to add listeners
+ $(document).on('pagecreate', '#history', function(e, data) {
+     
+     $('#clear-history-confirm-button').on('click', function(){
+         shinrinyoku.saveBox('history',[]);
+         $('div#history div.ui-content ul').empty();
+         $('clear-history-confirm').popup('close');
+     });
+     
+ });
+ 
  // good to set state
  $(document).on('pagebeforeshow', '#history', function(e, data) {
 
@@ -599,19 +700,79 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 
          // listen for view item request
          a1.on('click', function(){        
-            shinrinyoku.submit([ $(this).data('sy-survey-id') ]);
+            console.log("takes you to that place..");
          });
 
          $('div#history div.ui-content ul').append(li).trigger('create');
      }
      $('div#history div.ui-content ul').listview().listview('refresh');
-     console.log($('div#history div.ui-content ul'));
+     //console.log($('div#history div.ui-content ul'));
+     
+     // we can only empty a history if we have one
+     if(history.length > 0){
+         $('#clear-history-button').removeClass('ui-disabled');
+     }else{
+         $('#clear-history-button').addClass('ui-disabled');
+          var li = $('<li>History is empty.</li>');
+          $('div#history div.ui-content ul').append(li).trigger('create');
+          $('div#history div.ui-content ul').listview().listview('refresh');
+     }
 
 
  });
 
+/*
+ *  A B O U T  P A G E
+ */
+// good to add listeners
+$(document).on('pagecreate', '#about', function(e, data) {
 
+  // special access to the hidden developer page
+  $('#about h1').on('click', function(){
+      
+      // if we haven't been clicked set click to 1 and start a timer to clear it after a second
+      if(!shinrinyoku.dev_unlock){
+          shinrinyoku.dev_unlock = 1;
+          setTimeout(function(){ shinrinyoku.dev_unlock = 0}, 1000);
+          return;
+      }
+      
+      // if we have been clicked but not twice already increment the button
+      if(shinrinyoku.dev_unlock < 3){
+          shinrinyoku.dev_unlock++;
+          return;
+      }
+      
+      // on the fourth click in under a second you are through to here!
+      $("body").pagecontainer("change", "#developer", {
+                transition: 'flip',
+       });
+      
+      
+      console.log('You are in!!');
+  });
 
+});
+
+/*
+ *  D E V E L O P E R - P A G E
+ */
+ // good to set state
+ $(document).on('pagebeforeshow', '#developer', function(e, data) {
     
+     $('#developer-mode').prop('checked', shinrinyoku.developer_mode).checkboxradio('refresh');
+     $('#developer-submit-uri').val(shinrinyoku.submit_uri);
+     
+ });
+ // good to add listeners
+ $(document).on('pagecreate', '#developer', function(e, data) {
+ 
+    $('#developer-save-button').on('click', function(){
+        shinrinyoku.developer_mode = $('#developer-mode').prop('checked');
+        shinrinyoku.submit_uri = $('#developer-submit-uri').val();
+    });
+     
+ });
+ 
     
 
