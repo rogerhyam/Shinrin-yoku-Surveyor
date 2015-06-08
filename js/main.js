@@ -3,7 +3,7 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
-shinrinyoku.developer_mode = false;
+shinrinyoku.developer_mode = true;
 shinrinyoku.submit_uri = 'http://shinrinyoku.rbge.info/submit.php';
 
 /*
@@ -159,18 +159,6 @@ shinrinyoku.submit = function(survey_ids){
          
      });
      
-     // listen for stage save buttons
-     /*
-     $('a.sy-save-stage').on('click', function(){
-         console.log('save clicked');
-         sysurvey.stage++;
-         $("body").pagecontainer("change", "#survey", {
-                  transition: 'slide',
-                  reverse: true,
-              });
-     });
-     */
-     
      // listen for stage cancel button
      $('a.sy-cancel-stage').on('click', function(){
          console.log('cancel clicked');
@@ -181,6 +169,17 @@ shinrinyoku.submit = function(survey_ids){
          
          var button = $(this);
          var page = button.parents('div[data-role="page"]');
+         
+         var duration = 1000 * 60;
+         if(shinrinyoku.developer_mode) duration = 1000;
+         
+         // turn on the loading button
+         $.mobile.loading( "show", {
+                 text: button.data('ready-text'),
+                 textVisible: true,
+                 textonly: false,
+                 html: ""
+         });
          
          // change the button text
          button.html(button.data('on-text'));
@@ -200,7 +199,13 @@ shinrinyoku.submit = function(survey_ids){
              // remove the timer from the page now
              page.data('sy-timer', null);
              
-         },1000, button, page);
+             $.mobile.loading( "hide" );
+             
+         },duration, button, page);
+         
+         /*
+
+         */
          
          // keep a reference to the timer attached to the page incase we move away
          page.data('sy-timer', timer);
@@ -292,20 +297,22 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
     
     // check we have enabled the correct buttons
     // disable all the button and only enable the one we are on
-    /*
     var stages = $('#systage-list a');
-    stages.addClass('ui-disabled');
- 
-    if(sysurvey.stage >= stages.length){
-        // we are past the end of the stages so enable the save button
-        $('#sysurvey-complete').removeClass('ui-disabled');
+    
+    if(shinrinyoku.developer_mode){
+        stages.removeClass('ui-disabled');
     }else{
-        // enable the stage
-        $(stages[sysurvey.stage]).removeClass('ui-disabled');
-        // disable the save
-        $('#sysurvey-complete').addClass('ui-disabled');
+        stages.addClass('ui-disabled');
+        if(sysurvey.stage >= stages.length){
+            // we are past the end of the stages so enable the save button
+            $('#sysurvey-complete').removeClass('ui-disabled');
+        }else{
+            // enable the stage
+            $(stages[sysurvey.stage]).removeClass('ui-disabled');
+            // disable the save
+            $('#sysurvey-complete').addClass('ui-disabled');
+        }
     }
-    */
     
 });
 
