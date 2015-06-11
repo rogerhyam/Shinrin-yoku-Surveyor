@@ -181,13 +181,17 @@ shinrinyoku.submit = function(survey_ids){
                  html: ""
          });
          
+         
          // change the button text
          button.html(button.data('on-text'));
          
          // start a timer
          var timer = setTimeout(function(button, page){
              
-             // FIXME - VIBRATE PHONE
+             // VIBRATE PHONE
+             if(navigator.vibrate){
+                 navigator.vibrate([500,500,500,500,500]);
+             }
              
              // change the button txt and disable it
              button.html('Minute complete');
@@ -324,8 +328,8 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
  // Triggered when the page has been created, but before enhancement is complete
  // good to add listeners
  $(document).on('pagecreate', '#survey-grounding', function(e, data) {
+
      console.log("pagecreate #survey-grounding");
-    
     
      $('#grounding-start').on('click', function(){
          var d = new Date();
@@ -382,6 +386,14 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
  // good to set state
 $(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
 
+    // we should never be on this page without an active sysurvey
+    if(!sysurvey){
+       $("body").pagecontainer("change", "#survey", {
+           transition: 'slide',
+           reverse: true,
+       });         
+    }
+
     var buttons = $('#survey-grounding div.ui-content a');
     buttons.addClass('ui-disabled');
     $(buttons[0]).removeClass('ui-disabled');
@@ -414,6 +426,14 @@ $(document).on('pagecreate', '#survey-visual', function(e, data) {
 
 // good to set state
 $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
+
+    // we should never be on this page without an active sysurvey
+    if(!sysurvey){
+       $("body").pagecontainer("change", "#survey", {
+           transition: 'slide',
+           reverse: true,
+       });         
+    }
 
     // disable buttons till after minute has run
     $('div#survey-visual a.sy-metric').addClass('ui-disabled');
@@ -455,6 +475,14 @@ $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
 
 // good to set state
 $(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
+    
+    // we should never be on this page without an active sysurvey
+    if(!sysurvey){
+       $("body").pagecontainer("change", "#survey", {
+           transition: 'slide',
+           reverse: true,
+       });         
+    }
     
     // disable buttons till after minute has run
     $('div#survey-auditory a.sy-metric').addClass('ui-disabled');
@@ -525,6 +553,19 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
 
 });
 
+// good to set state
+$(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
+    
+    // we should never be on this page without an active sysurvey
+    if(!sysurvey){
+       $("body").pagecontainer("change", "#survey", {
+           transition: 'slide',
+           reverse: true,
+       });         
+    }
+    
+});
+
 /*
  * O V E R A L L - P A G E
  */
@@ -545,8 +586,18 @@ $(document).on('pagecreate', '#survey-emotional', function(e, data) {
      });
      
  });
+ // good to set state
+ $(document).on('pagebeforeshow', '#survey-overall', function(e, data) {
  
+     // we should never be on this page without an active sysurvey
+     if(!sysurvey){
+        $("body").pagecontainer("change", "#survey", {
+            transition: 'slide',
+            reverse: true,
+        });         
+     }
  
+ });
 
 /*
  * O U T B O X - P A G E
