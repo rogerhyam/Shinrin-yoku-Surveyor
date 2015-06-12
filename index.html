@@ -137,11 +137,11 @@
                     <li data-role="list-divider">Contact details (private)</li>
                     <li class="ui-field-contain">
                         <label for="real_name">Real Name:</label>
-                        <input name="real_name" id="real_name" value="" data-clear-btn="true" type="text">
+                        <input name="real_name" id="real_name" class="surveyor_field" value="" data-clear-btn="true" type="text">
                     </li>
                     <li class="ui-field-contain">
                         <label for="email">Email:</label>
-                        <input name="email" id="email" value="" data-clear-btn="true" type="text">
+                        <input name="email" id="email" class="surveyor_field" value="" data-clear-btn="true" type="text">
                     </li>
                     
                 </ul>
@@ -150,11 +150,11 @@
                     <li data-role="list-divider">Profile (public)</li>
                     <li class="ui-field-contain">
                         <label for="name2">Display Name:</label>
-                        <input name="display_name" id="display_name" value="" data-clear-btn="true" type="text">
+                        <input name="display_name" id="display_name" class="surveyor_field" value="" data-clear-btn="true" type="text">
                     </li>
                     <li class="ui-field-contain">
                         <label for="sex" class="select">Sex:</label>
-                        <select name="sex" id="sex">
+                        <select name="sex" id="sex" class="surveyor_field">
                             <option value="not-specified">- Not Specified -</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -162,7 +162,7 @@
                     </li>
                     <li class="ui-field-contain">
                         <label for="age" class="select">Age:</label>
-                        <select name="age" id="age">
+                        <select name="age" id="age" class="surveyor_field">
                             <option value="-1">- Not Specified -</option>
                             <option value="0-10">up to 10 years</option>
                             <option value="11-15">11-15 years</option>
@@ -178,13 +178,11 @@
                     </li>
                     <li class="ui-field-contain">
                         <label for="about_me">Other stuff:</label>
-                        <textarea cols="40" rows="8" name="about_me" id="about_me" placeholder="Anything else you would like to say about yourself."></textarea>
+                        <textarea cols="40" rows="8" name="about_me" id="about_me"  class="surveyor_field" placeholder="Anything else you would like to say about yourself."></textarea>
                     </li>
                     
                 </ul>
                 </form>
-                
-
                 
             </div><!-- end content -->
             
@@ -196,12 +194,6 @@
                 <p>Your <strong>Profile</strong> will be shared with the surveys you submit to help interpret the results.</p>                
                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
             </div>
- 
-            <div data-role="footer" data-position="fixed" >
-                <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-check">Save</a>
-                <a href="#" data-rel="back" data-direction="reverse" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-back">Cancel</a>
-            </div>
-            
             
         </div><!-- surveyor page -->
        
@@ -491,7 +483,7 @@
         <div data-role="page" id="survey-overall">
 
             <div data-role="header">
-                <a href="#survey" id="survey-overall-done" data-icon="arrow-l" >Survey</a>
+                <a href="#" id="survey-overall-done" data-icon="arrow-l" >Survey</a>
                 <h1>Overall</h1>
                 <a href="#survey-overall-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
@@ -501,15 +493,15 @@
                <ul data-role="listview" data-inset="true" >
                    <li data-role="list-divider">Location</li>
                    <li class="ui-field-contain" >
-                        <label for="textarea2">What do you call this place?</label>
-                        <input type="text" />
+                        <label for="sy-location_name">What do you call this place?</label>
+                        <input type="text" id="sy-location_name" name="sy-location_name" />
                    </li>
                    <li id="sy-geolocation-auto">
                        <label>Geolocation:</label>
                        <p>Where we are on the planet</p>
                    </li>
                    <li id="sy-geolocation-manual" class="ui-field-contain">
-                       <label for="textarea2">Location:</label>
+                       <label for="sy-location_manual">Location:</label>
                        <textarea cols="40" name="sy-location-manual" id="sy-location-manual"></textarea>
                        <p>You current location couldn't be determined automatically. Please enter an address including country, town and place.</p>
                    </li>
@@ -540,6 +532,12 @@
                      
                 </ul>
 
+             </div>
+             
+             <div data-role="popup" id="survey-overall-no-location-name" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Location Name</h3>
+                 <p>You need to enter a name for this location to continue.</p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
              </div>
 
              <div data-role="popup" id="survey-overall-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">

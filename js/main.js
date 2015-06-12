@@ -34,13 +34,9 @@ function ShinrinYokuSurvey(){
 var sysurvey = null;
 
 shinrinyoku.onGeoSuccess = function(position){
-    
-    console.log(position);
 
     // if survey is null they have given up
     if(!sysurvey) return;
-    
-    sysurvey.geolocation.position = position;
     
     // update the interface with the location
     if(position.coords.latitude > 0){
@@ -54,10 +50,20 @@ shinrinyoku.onGeoSuccess = function(position){
     }else{
         var lon = Math.abs(position.coords.longitude).toFixed(6) + '&deg; West';
     }
-    
+
     $('#sy-geolocation-auto p').html(lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)');
     $('#sy-geolocation-auto').show();
     $('#sy-geolocation-manual').hide();
+    
+    // save the coordinates - need to make a serialisable object
+    sysurvey.geolocation.longitude = position.coords.longitude;
+    sysurvey.geolocation.latitude = position.coords.latitude;
+    sysurvey.geolocation.accuracy = position.coords.accuracy;
+    sysurvey.geolocation.altitude = position.coords.altitude;
+    sysurvey.geolocation.altitudeAccuracy = position.coords.altitudeAccuracy;
+    sysurvey.geolocation.heading = position.coords.heading;    
+    sysurvey.geolocation.timestamp = position.timestamp;
+
 }
 
 shinrinyoku.onGeoError = function(error){
@@ -79,6 +85,33 @@ shinrinyoku.getBox = function(box_name){
 
 shinrinyoku.saveBox = function(box_name, box){
     window.localStorage.setItem(box_name, JSON.stringify(box));
+}
+
+
+shinrinyoku.saveSurveyor = function(){
+    var surveyor = {};
+    $('input.surveyor_field,select.surveyor_field,textarea.surveyor_field').each(function(index){        
+        surveyor[$(this).attr('id')] = $(this).val();
+    });
+    window.localStorage.setItem('surveyor', JSON.stringify(surveyor));
+}
+
+shinrinyoku.populateSurveyor = function(){
+    
+    var surveyor = window.localStorage.getItem('surveyor');
+    if(!surveyor){
+        shinrinyoku.saveSurveyor();
+        surveyor = window.localStorage.getItem('surveyor');
+    }
+    surveyor = JSON.parse(surveyor);
+    
+    $('input.surveyor_field,select.surveyor_field,textarea.surveyor_field').each(function(index){
+        $(this).val(surveyor[$(this).attr('id')]);
+        if($(this).is('select')){
+            $(this).selectmenu("refresh", true);
+        }
+    });
+        
 }
 
 shinrinyoku.submit = function(survey_ids){
@@ -573,17 +606,31 @@ $(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
  $(document).on('pagecreate', '#survey-overall', function(e, data) {
      
      // listen to the back button to validate etc
-     $('#survey-overall-done').on('click', function(){
+     $('#survey-overall-done').on('click', function(evt){
+         
+         // save the location name
+         var location_name = $('#sy-location_name').val();
+         if(!location_name){
+             $('#survey-overall-no-location-name').popup('open');
+             evt.preventDefault();
+             return;
+         }
+         sysurvey.location_name = location_name;
+         
+         // fixme - do we have a GPS location.
+         
 
          // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
+         
+         
          sysurvey.stage++;
-         console.log('overall done');
          $("body").pagecontainer("change", "#survey", {
              transition: 'slide',
              reverse: true,
          });
 
      });
+
      
  });
  // good to set state
@@ -597,6 +644,33 @@ $(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
         });         
      }
  
+ });
+ 
+/*
+ * S U R V E Y O R - P A G E 
+ */
+ // good to add listeners
+ $(document).on('pagecreate', '#surveyor', function(e, data) {
+
+     // listen for keyup on any field
+     $('.surveyor_field').keyup(function(){
+         shinrinyoku.saveSurveyor();
+     });
+     
+     // listen for the clear button on any text field
+     $('input.surveyor_field').parent().find('.ui-input-clear').on('click', function () {
+        shinrinyoku.saveSurveyor();
+     });
+
+     // listen for changing select lists
+     $('select.surveyor_field').on('change', function () {
+        shinrinyoku.saveSurveyor();
+     });
+ 
+ });
+ // good to set state
+ $(document).on('pagebeforeshow', '#surveyor', function(e, data) {
+     shinrinyoku.populateSurveyor();
  });
 
 /*
