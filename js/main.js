@@ -6,6 +6,10 @@ var shinrinyoku = {};
 shinrinyoku.developer_mode = true;
 shinrinyoku.submit_uri = 'http://shinrinyoku.rbge.info/submit.php';
 
+// duration of concious breaths
+shinrinyoku.min_grounding_duration = 30;
+shinrinyoku.max_grounding_duration = 90;
+
 /*
  * The survey object class
  */
@@ -369,33 +373,71 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
          sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
          $('#survey-grounding div.ui-content a').removeClass('ui-disabled');
          $(this).addClass('ui-disabled');
+         
+         // start the timer to cancel if they fall asleep
+         shinrinyoku.grounding_timer = setTimeout(function(){
+                $('#survey-grounding-slow').popup('open');
+                $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished').addClass('ui-disabled');
+                $('#grounding-start').removeClass('ui-disabled');
+                if(navigator.vibrate){
+                    navigator.vibrate([300,500,300,500,300]);
+                }
+             }, shinrinyoku.max_grounding_duration * 1000);
+         
      });
      
      $('#grounding-lost, #grounding-over, #grounding-cancel').on('click', function(){
+         
+         if(shinrinyoku.grounding_timer){
+             clearTimeout(shinrinyoku.grounding_timer);
+             shinrinyoku.grounding_timer = false;
+         }
+         
          var buttons = $('#survey-grounding div.ui-content a');
          buttons.addClass('ui-disabled');
          $(buttons[0]).removeClass('ui-disabled');
          var d = new Date();
          sysurvey.groundings[sysurvey.groundings.length - 1]['failed'] = d.getTime();
+         
      });
     
      $('#grounding-finished').on('click', function(){
+         
+         if(shinrinyoku.grounding_timer){
+             clearTimeout(shinrinyoku.grounding_timer);
+             shinrinyoku.grounding_timer = false;
+         }
          
          var d = new Date();
          var session = sysurvey.groundings[sysurvey.groundings.length - 1];
          session.finished = d.getTime();
          var duration = session.finished - session.started;
+         duration = duration / 1000; // seconds is easier
          
-         // FIXME: check the breathing time was reasonable
-         console.log(sysurvey.groundings);
-         alert(Math.round(duration / 1000) + ' seconds' );
+         /*
+         Respiratory rate: A person's respiratory rate is the number of breaths you take per minute. 
+         The normal respiration rate for an adult at rest is 12 to 20 breaths per minute.
+         A respiration rate under 12 or over 25 breaths per minute while resting is considered abnormal.
          
-         // got to here then we are good to go
-         sysurvey.stage++;
-         $("body").pagecontainer("change", "#survey", {
-                 transition: 'slide',
-                 reverse: true,
+         therefore a breath should take between 5 seconds and 2.5 seconds
+         
+         So they should do 10 breaths between 25 and 50 seconds. Round it to 30 - 90 secs (for the very slow)
+         
+         */
+         
+         // too quick
+         if (duration < shinrinyoku.min_grounding_duration){
+             $('#survey-grounding-fast').popup('open');
+              var buttons = $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished');
+              buttons.addClass('ui-disabled');
+              $('#grounding-start').removeClass('ui-disabled');
+         }else{
+             sysurvey.stage++;
+             $("body").pagecontainer("change", "#survey", {
+               transition: 'slide',
+               reverse: true,
              });
+         }
 
      });
      
@@ -424,12 +466,19 @@ $(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
        $("body").pagecontainer("change", "#survey", {
            transition: 'slide',
            reverse: true,
-       });         
+       });
+       return;
     }
-
-    var buttons = $('#survey-grounding div.ui-content a');
+    
+    if(shinrinyoku.developer_mode){
+        shinrinyoku.min_grounding_duration = 2;
+        shinrinyoku.max_grounding_duration = 5;
+    }
+    
+    // reset the buttons 
+    var buttons = $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished');
     buttons.addClass('ui-disabled');
-    $(buttons[0]).removeClass('ui-disabled');
+    $('#grounding-start').removeClass('ui-disabled');
 
 });
 
@@ -608,7 +657,7 @@ $(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
     li.detach().sort(function(a, b){
         return  $(a).data('random-sort') - $(b).data('random-sort');
     });
-    ul.append(li);
+    ul.append(li).listview( "refresh" );
     
     // keep a record of the tag order
     sysurvey.tag_order = new Array();

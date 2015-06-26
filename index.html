@@ -42,7 +42,7 @@
         <!-- Start of first page -->
         <div data-role="page" id="home">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#about" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >About</a>
                 <h1>Shinrin-Yoku</h1>
                 <a href="#help" data-transition="slide" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -105,7 +105,7 @@
         <!-- About Page -->
         <div data-role="page" id="about">
 
-        	<div data-role="header">
+        	<div data-role="header" data-position="fixed">
         		<h1>About</h1>
         	    <a href="#home" data-transition="slide" data-icon="arrow-r" data-iconpos="right" class="ui-btn-right" >Home</a>
         	</div><!-- /header -->
@@ -124,7 +124,7 @@
         <!-- Surveyor Page -->
         <div data-role="page" id="surveyor">
             
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
                 <h1>About You</h1>
                 <a href="#surveyor-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -200,7 +200,7 @@
         <!-- Survey Page -->
         <div data-role="page" id="survey">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
                 <h1>Survey</h1>
                 <a href="#survey-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -253,7 +253,7 @@
              </div>
              
              <div data-role="footer" data-position="fixed" >
-                 <a href="#" id="sysurvey-complete" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-check">Complete</a>
+                 <a href="#" id="sysurvey-complete" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-check">Save</a>
                  <a href="#home" data-transition="slide" data-direction="reverse" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-back">Cancel</a>
              </div>
              
@@ -262,7 +262,7 @@
         <!-- Survey Visual Page -->
         <div data-role="page" id="survey-visual">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#" id="survey-visual-done" data-icon="arrow-l" >Survey</a>
                 <h1>Visual</h1>
                 <a href="#survey-visual-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -276,25 +276,25 @@
                     <li data-role="list-divider">What did you see?</li>
                     <li data-icon="false" class="sy-strength-colour-0" >
                         <a class="sy-metric"  data-sy-metric="visual_trees" href="#" >
-                           Trees &amp; Shrubs
+                           Trees, shrubs
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false" class="sy-strength-colour-0" >
                         <a class="sy-metric"  data-sy-metric="visual_herbs" href="#" >
-                           Plants &amp; Flowers
+                           Plants, flowers
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_lawns" href="#" >
-                           Lawns &amp; Grass
+                           Lawns, grass
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_rock" href="#" >
-                           Rock, Stone, Sand 
+                           Rock, stone, sand 
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
@@ -324,25 +324,25 @@
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_buildings" href="#" >
-                           Buildings, Walls &amp; Fencing
+                           Buildings, walls, fencing
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_paving" href="#" >
-                           Paving &amp; Surfacing
+                           Paving, surfacing
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_signage" href="#" >
-                           Signs, Pictures &amp;  Graffiti
+                           Signs, pictures, graffiti
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
                     <li data-icon="false">
                         <a class="sy-metric sy-strength-colour-0"  data-sy-metric="visual_rubbish" href="#" >
-                           Rubbish/trash
+                           Rubbish, trash
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
@@ -361,7 +361,7 @@
         <!-- Survey Auditory Page -->
         <div data-role="page" id="survey-auditory">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#" id="survey-auditory-done" data-icon="arrow-l" >Survey</a>
                 <h1>Auditory</h1>
                 <a href="#survey-auditory-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -387,15 +387,55 @@
                         </a>
                     </li>
                     <li data-icon="false" class="sy-strength-colour-0" >
-                        <a class="sy-metric"  data-sy-metric="auditory_people" href="#" >
-                           People's voices
+                        <a class="sy-metric"  data-sy-metric="auditory_insects" href="#" >
+                           Insects
                            <span class="ui-li-count">0</span>
                         </a>
                     </li>
-                   
-                   
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_animals" href="#" >
+                           Other animals
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_water" href="#" >
+                           Water
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_people" href="#" >
+                           Voices
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_music" href="#" >
+                           Music
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_traffic" href="#" >
+                           Road Traffic
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_aircraft" href="#" >
+                           Aircraft
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
+                    <li data-icon="false" class="sy-strength-colour-0" >
+                        <a class="sy-metric"  data-sy-metric="auditory_machinery" href="#" >
+                           Machinery
+                           <span class="ui-li-count">0</span>
+                        </a>
+                    </li>
                 </ul>
-                
+        
              </div>
              
              <div data-role="popup" id="survey-auditory-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
@@ -409,7 +449,7 @@
         <!-- Survey Grounding Page -->
         <div data-role="page" id="survey-grounding">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#" id="survey-grounding-done" data-icon="arrow-l" >Survey</a>
                 <h1>Grounding</h1>
                 <a href="#survey-grounding-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -426,6 +466,28 @@
                 <a href="#" id="grounding-cancel" class="ui-btn ui-corner-all" >Cancel</a> 
                 
              </div>
+
+             <div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Breathing Slow</h3>
+                 <p>
+                    You have been conscious breathing for more than 90 seconds which is a bit slow.  
+                    Perhaps you lost count?
+                    Try again.
+                    Just do normal relaxed breathing.
+                </p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
+             
+             <div data-role="popup" id="survey-grounding-fast" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Breathing Fast</h3>
+                 <p>
+                     You have been conscious breathing for less than 30 seconds which is a little fast.
+                     Perhaps you should slow down and try again.
+                     Try again.
+                     Just do normal relaxed breathing.
+                </p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
              
              <div data-role="popup" id="survey-grounding-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                  <h3>Grounding Help</h3>
@@ -439,7 +501,7 @@
          <!-- Survey Emotions Page -->
         <div data-role="page" id="survey-emotional">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#" id="survey-emotional-done" data-icon="arrow-l" >Survey</a>
                 <h1>Emotions</h1>
                 <a href="#survey-emotional-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -519,7 +581,7 @@
          <!-- Survey overall Page -->
         <div data-role="page" id="survey-overall">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#" id="survey-overall-done" data-icon="arrow-l" >Survey</a>
                 <h1>Overall</h1>
                 <a href="#survey-overall-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -589,7 +651,7 @@
          <!-- Outbox overall Page -->
         <div data-role="page" id="outbox">
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
                 <h1>Outbox</h1>
                 <a href="#outbox-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -643,7 +705,7 @@
          <!-- History Page -->
         <div data-role="page" id="history" >
 
-            <div data-role="header">
+            <div data-role="header" data-position="fixed">
                 <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
                 <h1>History</h1>
                 <a href="#history-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -706,7 +768,7 @@
          <!-- Developer Page -->
          <div data-role="page" id="developer">
 
-         	<div data-role="header">
+         	<div data-role="header" data-position="fixed">
          		<h1>Developer</h1>
          	    <a href="#home" data-transition="flip"  data-iconpos="right" class="ui-btn-right" >Close</a>
          	</div><!-- /header -->

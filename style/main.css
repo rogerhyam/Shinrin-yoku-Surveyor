@@ -8,22 +8,47 @@ li.sy-strength-colour-0{
 
 
 li.ui-li-has-count.sy-strength-colour-2 a{
-     background-color: rgba(162, 255, 153, 0.4);
+     background-color: rgba(162, 255, 153, 0.5);
 }
 
 li.ui-li-has-count.sy-strength-colour-1 a{
-     background-color: rgba(235, 255, 153, 0.4);
+     background-color: rgba(235, 255, 153, 0.5);
 }
 
 li.ui-li-has-count.sy-strength-colour-0 a{
-     background-color: rgba(204, 204, 204, 0.12);
+     background-color: rgba(204, 204, 204, 0.5);
 }
 
 li.ui-li-has-count.sy-strength-colour--1 a{
-     background-color: rgba(255, 175, 153, 0.4);
+     background-color: rgba(255, 175, 153, 0.5);
 }
 
 li.ui-li-has-count.sy-strength-colour--2 a{
-     background-color: rgba(255, 122, 122, 0.51);
+     background-color: rgba(255, 122, 122, 0.5);
 }
 
+/*
+
+div.ui-page{
+    color: white;
+    text-shadow: 0  1px 0  black;
+    background: linear-gradient(to bottom, #0d386d 0%,#70933e 85%); 
+}
+
+div.ui-content.ui-popup{
+    color: white;
+    text-shadow: 0  1px 0  black;
+    background-color: #0D386D;
+    border: solid white 1px;
+    box-shadow: 1px 1px 3px black;
+}
+
+div.ui-popup-screen{
+    background-color: black;
+}
+
+div.ui-page div.ui-content ul{
+
+}
+
+*/
