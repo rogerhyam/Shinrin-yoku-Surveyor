@@ -223,7 +223,7 @@ shinrinyoku.submit = function(survey_ids){
              
              // VIBRATE PHONE
              if(navigator.vibrate){
-                 navigator.vibrate([500,500,500,500,500]);
+                 navigator.vibrate([300,500,300,500,300]);
              }
              
              // change the button txt and disable it
@@ -500,7 +500,7 @@ $(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
          console.log('auditory done');
          $("body").pagecontainer("change", "#survey", {
              transition: 'slide',
-             direction: 'reverse'
+             reverse: true,
          });
 
      });
@@ -594,8 +594,27 @@ $(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
        $("body").pagecontainer("change", "#survey", {
            transition: 'slide',
            reverse: true,
-       });         
+       });
+       return;
     }
+    
+    // the list items are arranged randomly to prevent habit ticking
+    var ul = $('ul#survey-emotional-list');
+    var li = ul.children("li");
+    li.each(function(){
+       $(this).data('random-sort', Math.random());
+    });
+    
+    li.detach().sort(function(a, b){
+        return  $(a).data('random-sort') - $(b).data('random-sort');
+    });
+    ul.append(li);
+    
+    // keep a record of the tag order
+    sysurvey.tag_order = new Array();
+    li.each(function(index){
+       sysurvey.tag_order[index] = $(this).children('a').data('sy-val');
+    });
     
 });
 
