@@ -21,10 +21,8 @@ function ShinrinYokuSurvey(){
         return v.toString(16);
     });
     
-    this.stage = 0;
     this.complete = false;
     this.groundings = new Array();
-    this.tags = new Array();
     this.geolocation = new Object();
     
     // tag the creation time
@@ -32,6 +30,7 @@ function ShinrinYokuSurvey(){
     this.started = now.getTime();
 
     // find the location
+    // fixme - this should use watch location
     navigator.geolocation.getCurrentPosition(shinrinyoku.onGeoSuccess, shinrinyoku.onGeoError);
     
 }
@@ -162,97 +161,6 @@ shinrinyoku.submit = function(survey_ids){
          $( "#strength-popup" ).data('sy-metric-anchor', $(this));
          $( "#strength-popup" ).popup('open');
      });
-   
-     // Instantiate the strength popup on DOMReady, and enhance its contents
-     // it is used across multiple pages
-     $( "#strength-popup" ).enhanceWithin().popup();
-     
-     // listen for when the popup appear
-     $( "#strength-popup" ).on('popupbeforeposition', function(event, ui){
-        console.log(event);
-        console.log(ui); 
-     });
-     
-     // listen for button clicks on strength popup
-     $('div#strength-popup a').on('click', function(){
-         
-         var anchor =  $( "#strength-popup" ).data('sy-metric-anchor');     
-         var sy_metric = anchor.data('sy-metric');
-         var sy_val = $(this).data('sy-strength');
-         sysurvey[sy_metric] = sy_val;
-         
-         // update the view
-         anchor.parent().find('.ui-li-count').html(sy_val);
-         
-         // remove any flagging classes
-         anchor.parent().removeClass (function (index, css) {
-             return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
-         });
-         
-         anchor.parent().addClass('sy-strength-colour-' + sy_val);
-         
-         console.log(sysurvey);
-         $(this).parent().popup('close');
-         
-     });
-     
-     // listen for stage cancel button
-     $('a.sy-cancel-stage').on('click', function(){
-         console.log('cancel clicked');
-     });
-     
-     // listen for minute timout buttons
-     $('button.sy-sampling-minute-button').on('click', function(){
-         
-         var button = $(this);
-         var page = button.parents('div[data-role="page"]');
-         
-         var duration = 1000 * 60;
-         if(shinrinyoku.developer_mode) duration = 1000;
-         
-         // turn on the loading button
-         $.mobile.loading( "show", {
-                 text: button.data('ready-text'),
-                 textVisible: true,
-                 textonly: false,
-                 html: ""
-         });
-         
-         
-         // change the button text
-         button.html(button.data('on-text'));
-         
-         // start a timer
-         var timer = setTimeout(function(button, page){
-             
-             // VIBRATE PHONE
-             if(navigator.vibrate){
-                 navigator.vibrate([300,500,300,500,300]);
-             }
-             
-             // change the button txt and disable it
-             button.html('Minute complete');
-             button.addClass('ui-disabled');
-             
-             // enable everyting else on the page
-             $('a.sy-metric', page).removeClass('ui-disabled');
-
-             // remove the timer from the page now
-             page.data('sy-timer', null);
-             
-             $.mobile.loading( "hide" );
-             
-         },duration, button, page);
-         
-         /*
-
-         */
-         
-         // keep a reference to the timer attached to the page incase we move away
-         page.data('sy-timer', timer);
-         
-         console.log($(this));
-     });
      
  });
 
@@ -289,86 +197,16 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
 });
 
 /*
- *  S U R V E Y - P A G E 
- */
-
- // Triggered when the page has been created, but before enhancement is complete
- // good to add listeners
- $(document).on('pagecreate', '#survey', function(e, data) {
-    
-    $('#sysurvey-complete').on('click', function(){
-       
-        // save the survey - there should be no need for validation
-        var now = new Date();
-        sysurvey.completed = now.getTime();
-        sysurvey.timezoneOffset = now.getTimezoneOffset();
-        // not sure if daylight saving is always included...
-        
-        // add it to the outbox
-        var outbox = shinrinyoku.getBox('outbox');
-        outbox.push(sysurvey);
-        shinrinyoku.saveBox('outbox', outbox);
-        
-        sysurvey = null;
-        $("body").pagecontainer("change", "#home", {
-                 transition: 'slide',
-                 reverse: true,
-             });
-        
-        console.log(sysurvey);
-        
-       
-    });
-    
- });
-
-// Triggered on the "to" page, before transition animation starts
-$(document).on('pagebeforeshow', '#survey', function(e, data) {
-    
-    
-    if(sysurvey == null){
-        sysurvey = new ShinrinYokuSurvey();
-    }
-    
-    // also create new survey if it is older than 30 minutes.
-    var now = new Date();
-    if((now - sysurvey.started) > (30*60*1000)){
-         sysurvey = new ShinrinYokuSurvey();
-    }
-    
-    // check we have enabled the correct buttons
-    // disable all the button and only enable the one we are on
-    var stages = $('#systage-list a');
-    
-    if(shinrinyoku.developer_mode){
-        stages.removeClass('ui-disabled');
-    }else{
-        stages.addClass('ui-disabled');
-        if(sysurvey.stage >= stages.length){
-            // we are past the end of the stages so enable the save button
-            $('#sysurvey-complete').removeClass('ui-disabled');
-        }else{
-            // enable the stage
-            $(stages[sysurvey.stage]).removeClass('ui-disabled');
-            // disable the save
-            $('#sysurvey-complete').addClass('ui-disabled');
-        }
-    }
-    
-});
-
-
-/*
- * G R O U N D I N G - P A G E 
+ * T E N - - B R E A T H S - P A G E 
  */
  
  // Triggered when the page has been created, but before enhancement is complete
  // good to add listeners
- $(document).on('pagecreate', '#survey-grounding', function(e, data) {
+ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
 
      console.log("pagecreate #survey-grounding");
     
-     $('#grounding-start').on('click', function(){
+     $('#ten-breaths-start').on('click', function(){
          var d = new Date();
          sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
          $('#survey-grounding div.ui-content a').removeClass('ui-disabled');
@@ -438,49 +276,74 @@ $(document).on('pagebeforeshow', '#survey', function(e, data) {
                reverse: true,
              });
          }
+         
+         // fixme - enable rest of fields
 
      });
      
      // listen to the back button to validate etc
-     $('#survey-grounding-done').on('click', function(){
+     $('#ten-breaths-back').on('click', function(){
 
-         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
-         sysurvey.stage++;
-         console.log('grounding done');
-         $("body").pagecontainer("change", "#survey", {
+         // FIXME - CHECK WE ARE OK TO MOVE BACK TO home page
+         $("body").pagecontainer("change", "#home", {
              transition: 'slide',
              reverse: true,
          });
 
      });
+     
+     $('#ten-breaths-save').on('click', function(){
+
+         // save the survey - there should be no need for validation
+         var now = new Date();
+         sysurvey.completed = now.getTime();
+         sysurvey.timezoneOffset = now.getTimezoneOffset();
+         // not sure if daylight saving is always included...
+
+         // add it to the outbox
+         var outbox = shinrinyoku.getBox('outbox');
+         outbox.push(sysurvey);
+         shinrinyoku.saveBox('outbox', outbox);
+
+         sysurvey = null;
+         $("body").pagecontainer("change", "#home", {
+                  transition: 'slide',
+                  reverse: true,
+              });
+
+         console.log(sysurvey);
+
+     });
+     
     
      
  });
- 
- // Triggered on the "to" page, before transition animation starts
- // good to set state
-$(document).on('pagebeforeshow', '#survey-grounding', function(e, data) {
 
-    // we should never be on this page without an active sysurvey
-    if(!sysurvey){
-       $("body").pagecontainer("change", "#survey", {
-           transition: 'slide',
-           reverse: true,
-       });
-       return;
-    }
+ // Triggered on the "to" page, before transition animation starts
+ $(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
+     
+     // we must have a sysurvey object to use
+     if(sysurvey == null){
+         sysurvey = new ShinrinYokuSurvey();
+     }
     
     if(shinrinyoku.developer_mode){
         shinrinyoku.min_grounding_duration = 2;
         shinrinyoku.max_grounding_duration = 5;
     }
     
-    // reset the buttons 
+    // set the buttons ready for a new breathing exercise
     var buttons = $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished');
     buttons.addClass('ui-disabled');
     $('#grounding-start').removeClass('ui-disabled');
 
+   
+    
+
+
+    
 });
+
 
 /*
  * V I S U A L - P A G E 
