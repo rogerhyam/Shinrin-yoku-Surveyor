@@ -7,8 +7,8 @@ shinrinyoku.developer_mode = true;
 shinrinyoku.submit_uri = 'http://shinrinyoku.rbge.info/submit.php';
 
 // duration of concious breaths
-shinrinyoku.min_grounding_duration = 30;
-shinrinyoku.max_grounding_duration = 90;
+shinrinyoku.min_breaths_duration = 30;
+shinrinyoku.max_breaths_duration = 90;
 
 /*
  * The survey object class
@@ -204,47 +204,56 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
  // good to add listeners
  $(document).on('pagecreate', '#ten-breaths', function(e, data) {
 
-     console.log("pagecreate #survey-grounding");
+     console.log("pagecreate #ten-breaths");
     
      $('#ten-breaths-start').on('click', function(){
+         
          var d = new Date();
+         
+         // if we are already running then cancel and return
+         if(shinrinyoku.grounding_timer){
+             sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             $('#ten-breaths-start').text('Start');
+             clearTimeout(shinrinyoku.grounding_timer);
+             shinrinyoku.grounding_timer = false;
+             return;
+         }
+         
+         // Start them off
          sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
-         $('#survey-grounding div.ui-content a').removeClass('ui-disabled');
-         $(this).addClass('ui-disabled');
+         
+         $('#ten-breaths-finished').removeClass('ui-disabled');
+         $('#ten-breaths-start').text('Cancel');
          
          // start the timer to cancel if they fall asleep
          shinrinyoku.grounding_timer = setTimeout(function(){
+                
                 $('#survey-grounding-slow').popup('open');
-                $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished').addClass('ui-disabled');
-                $('#grounding-start').removeClass('ui-disabled');
+                
+                $('#ten-breaths-finished').addClass('ui-disabled');
+                $('#ten-breaths-start').text('Start');
+                shinrinyoku.ten_breaths_running = false;               
+
                 if(navigator.vibrate){
                     navigator.vibrate([300,500,300,500,300]);
                 }
-             }, shinrinyoku.max_grounding_duration * 1000);
+                
+             }, shinrinyoku.max_breaths_duration * 1000);
          
      });
      
-     $('#grounding-lost, #grounding-over, #grounding-cancel').on('click', function(){
-         
-         if(shinrinyoku.grounding_timer){
-             clearTimeout(shinrinyoku.grounding_timer);
-             shinrinyoku.grounding_timer = false;
-         }
-         
-         var buttons = $('#survey-grounding div.ui-content a');
-         buttons.addClass('ui-disabled');
-         $(buttons[0]).removeClass('ui-disabled');
-         var d = new Date();
-         sysurvey.groundings[sysurvey.groundings.length - 1]['failed'] = d.getTime();
-         
-     });
     
-     $('#grounding-finished').on('click', function(){
+     $('#ten-breaths-finished').on('click', function(){
          
+         // stop the timer
          if(shinrinyoku.grounding_timer){
              clearTimeout(shinrinyoku.grounding_timer);
              shinrinyoku.grounding_timer = false;
          }
+         
+         // drop the running flag
+         shinrinyoku.ten_breaths_running = false;
          
          var d = new Date();
          var session = sysurvey.groundings[sysurvey.groundings.length - 1];
@@ -264,25 +273,27 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
          */
          
          // too quick
-         if (duration < shinrinyoku.min_grounding_duration){
-             $('#survey-grounding-fast').popup('open');
-              var buttons = $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished');
-              buttons.addClass('ui-disabled');
-              $('#grounding-start').removeClass('ui-disabled');
+         if (duration < shinrinyoku.min_breaths_duration){
+             session.toofast = true;   
+             $('#survey-grounding-fast').popup('open');   
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             $('#ten-breaths-start').text('Start');
          }else{
-             sysurvey.stage++;
-             $("body").pagecontainer("change", "#survey", {
-               transition: 'slide',
-               reverse: true,
-             });
+             
+             // they are ready to save..
+             $('#ten-breaths-text').removeClass('ui-disabled');
+             $('#ten-breaths-photo').removeClass('ui-disabled');
+             $('#ten-breaths-save').removeClass('ui-disabled');
+        
          }
          
-         // fixme - enable rest of fields
 
      });
      
      // listen to the back button to validate etc
      $('#ten-breaths-back').on('click', function(){
+
+         // fixme: stop the GPS watch
 
          // FIXME - CHECK WE ARE OK TO MOVE BACK TO home page
          $("body").pagecontainer("change", "#home", {
@@ -294,7 +305,9 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
      
      $('#ten-breaths-save').on('click', function(){
 
-         // save the survey - there should be no need for validation
+         // fixme: stop the GPS watch
+
+         // save the survey - 
          var now = new Date();
          sysurvey.completed = now.getTime();
          sysurvey.timezoneOffset = now.getTimezoneOffset();
@@ -328,18 +341,17 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
      }
     
     if(shinrinyoku.developer_mode){
-        shinrinyoku.min_grounding_duration = 2;
-        shinrinyoku.max_grounding_duration = 5;
+        shinrinyoku.min_breaths_duration = 2;
+        shinrinyoku.max_breaths_duration = 5;
     }
     
     // set the buttons ready for a new breathing exercise
-    var buttons = $('#grounding-lost, #grounding-over, #grounding-cancel, #grounding-finished');
-    buttons.addClass('ui-disabled');
-    $('#grounding-start').removeClass('ui-disabled');
-
-   
-    
-
+    $('#ten-breaths-start').text('Start');
+    $('#ten-breaths-start').removeClass('ui-disabled');
+    $('#ten-breaths-finished').addClass('ui-disabled');
+    $('#ten-breaths-text').addClass('ui-disabled');
+    $('#ten-breaths-photo').addClass('ui-disabled');
+    $('#ten-breaths-save').addClass('ui-disabled');
 
     
 });
