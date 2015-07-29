@@ -4,7 +4,7 @@
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
 shinrinyoku.developer_mode = true;
-shinrinyoku.submit_uri = 'http://shinrinyoku.rbge.info/submit.php';
+shinrinyoku.submit_uri = 'http://tenbreaths.rbge.info/submit/index.php';
 
 // duration of concious breaths
 shinrinyoku.min_breaths_duration = 30;
@@ -21,7 +21,8 @@ function ShinrinYokuSurvey(){
         return v.toString(16);
     });
     
-    this.complete = false;
+    this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
+    this.complete = false; // time they finished survey and clicked save
     this.groundings = new Array();
     this.geolocation = new Object();
     
@@ -30,8 +31,18 @@ function ShinrinYokuSurvey(){
     this.started = now.getTime();
 
     // find the location
-    // fixme - this should use watch location
-    navigator.geolocation.getCurrentPosition(shinrinyoku.onGeoSuccess, shinrinyoku.onGeoError);
+    shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
+        shinrinyoku.onGeoSuccess,
+        shinrinyoku.onGeoError,
+        {
+            enableHighAccuracy: true, 
+            maximumAge        : 10 * 1000, 
+            timeout           : 10 * 1000
+        }
+        );
+    
+    // set a timeout to clear the watch handler after 2 minutes no matter what - we don't want to flatten their battery
+    setTimeout(shinrinyoku.stopGps, 1000 * 60 * 2 );
     
 }
 var sysurvey = null;
@@ -43,20 +54,18 @@ shinrinyoku.onGeoSuccess = function(position){
     
     // update the interface with the location
     if(position.coords.latitude > 0){
-        var lat = position.coords.latitude.toFixed(6) + '&deg; North';
+        var lat = position.coords.latitude.toFixed(4) + '&deg; N';
     }else{
-        var lat = Math.abs(position.coords.latitude).toFixed(6) + '&deg; South';
+        var lat = Math.abs(position.coords.latitude).toFixed(4) + '&deg; S';
     }
     
     if(position.coords.longitude > 0){
-        var lon = Math.abs(position.coords.longitude).toFixed(6) + '&deg; East';
+        var lon = Math.abs(position.coords.longitude).toFixed(4) + '&deg; E';
     }else{
-        var lon = Math.abs(position.coords.longitude).toFixed(6) + '&deg; West';
+        var lon = Math.abs(position.coords.longitude).toFixed(4) + '&deg; W';
     }
 
-    $('#sy-geolocation-auto p').html(lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)');
-    $('#sy-geolocation-auto').show();
-    $('#sy-geolocation-manual').hide();
+    $('#sy-geolocation-auto p').html('<strong>Position:</strong> ' + lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)');
     
     // save the coordinates - need to make a serialisable object
     sysurvey.geolocation.longitude = position.coords.longitude;
@@ -70,10 +79,39 @@ shinrinyoku.onGeoSuccess = function(position){
 }
 
 shinrinyoku.onGeoError = function(error){
+    
     console.log(error);
+    
+    // save the error to survey so we know what it is
     sysurvey.geolocation.error = error;
-    $('#sy-geolocation-auto').hide();
-    $('#sy-geolocation-manual').show();
+    
+    // make sure we clear the watcher so we don't continue to get GPS readings
+    shinrinyoku.stopGps();
+
+}
+
+shinrinyoku.stopGps = function(){
+    if(shinrinyoku.location_watch_handle){
+        navigator.geolocation.clearWatch(shinrinyoku.location_watch_handle);
+        shinrinyoku.location_watch_handle = false;
+    }
+}
+
+shinrinyoku.onPhotoSuccess = function(imageData){
+    
+    // write it to the survey object
+    sysurvey.photo = imageData;
+    
+    // display it.
+    $('#sy-photo img').attr('src',  imageData);
+    $('#sy-photo-take').hide();
+    $('#sy-photo').show('slow');
+    
+}
+
+shinrinyoku.onPhotoError = function(message){
+    // fixme this should be a proper popup
+    alert(message);
 }
 
 shinrinyoku.getBox = function(box_name){
@@ -126,11 +164,54 @@ shinrinyoku.submit = function(survey_ids){
         
         var survey_id = survey_ids[i];
         
+        // load the survey
+        for(var j=0; j < outbox.length; j++){
+            if(outbox[j].id == survey_id){
+                var survey = outbox[j];
+                break;
+            }
+        }
         
-        // do a call to submit this entry
-        // FIXME
+        // get a string representation.
+        var survey_string = JSON.stringify(survey);
         
-        // if successful
+        // the surveyor object
+        var surveyor = window.localStorage.getItem('surveyor');
+        var surveyor_string = JSON.stringify(surveyor);
+        
+        // post it to the server
+ 
+        $.ajax({
+            url: shinrinyoku.submit_uri,
+            type: 'POST',
+            data: {
+                'survey': survey_string,
+                'surveyor': surveyor_string
+            },
+            success: function(data){
+                console.log(data);
+                console.log("About to submit photo");
+                shinrinyoku.submitPhoto(survey);
+                alert('Data saved');
+            },
+            error: function(error){
+            	console.log(error);
+            	alert('An error!');
+            }
+        });
+ 
+        /*
+        $.post(
+            shinrinyoku.submit_uri,
+            "survey=banana&surveyor=cake",
+            function(data){
+                console.log(data);
+                alert('Data saved');
+                shinrinyoku.submitPhoto(survey);
+            }
+        );
+        */
+        
         // move from the out to history boxes
         for(var j=0; j < outbox.length; j++){
             if(outbox[j].id == survey_id){
@@ -150,6 +231,42 @@ shinrinyoku.submit = function(survey_ids){
     
 }
 
+shinrinyoku.submitPhoto = function(survey){
+    
+    if(survey.photo){
+        
+        var options = new FileUploadOptions();
+        options.fileKey = "file";
+        options.fileName = survey.id + '.jpg';
+        options.mimeType = "image/jpeg";
+        options.chunkedMode = false;
+        options.httpMethod = 'POST';
+        options.params = {'survey_id': survey.id};
+        
+        var ft = new FileTransfer();
+        ft.upload(
+             survey.photo,
+             encodeURI(shinrinyoku.submit_uri),
+             function(r){
+                 // success
+                 alert( "photo uploaded" );
+                 console.log("Code = " + r.responseCode);
+                 console.log("Response = " + r.response);
+                 console.log("Sent = " + r.bytesSent);
+             },
+             function(error){
+                 alert("An error has occurred: Code = " + error.code);
+                 console.log("upload error source " + error.source);
+                 console.log("upload error target " + error.target);
+             },
+             options);
+    }else{
+        console.log('No photo to submit.')
+    }
+    
+
+    
+}
 
 /*
  * W H O L E - D O C U M E N T 
@@ -246,14 +363,11 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
     
      $('#ten-breaths-finished').on('click', function(){
          
-         // stop the timer
+         // stop the breath timer
          if(shinrinyoku.grounding_timer){
              clearTimeout(shinrinyoku.grounding_timer);
              shinrinyoku.grounding_timer = false;
          }
-         
-         // drop the running flag
-         shinrinyoku.ten_breaths_running = false;
          
          var d = new Date();
          var session = sysurvey.groundings[sysurvey.groundings.length - 1];
@@ -280,38 +394,137 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
              $('#ten-breaths-start').text('Start');
          }else{
              
+             sysurvey.ten_breaths_completed = true;
+             
              // they are ready to save..
              $('#ten-breaths-text').removeClass('ui-disabled');
              $('#ten-breaths-photo').removeClass('ui-disabled');
              $('#ten-breaths-save').removeClass('ui-disabled');
-        
+             $('#ten-breaths-start').text('Start');
+             $('#ten-breaths-start').addClass('ui-disabled');
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             
+             // hopefully we have a position by now - if so we show it
+             // if not we ask them to enter one
+             
+             console.log(sysurvey);
+             
+             if(sysurvey.geolocation.error){
+                 $('#sy-geolocation-auto').hide();
+                 $('#sy-geolocation-manual').show();
+                 $('#sy-geolocation-manual textarea').focus();
+             }else{
+                 $('#sy-geolocation-manual').hide();
+                 $('#sy-geolocation-auto').show();
+                 $('#ten-breaths-text').focus();
+             }
+             
          }
-         
 
      });
      
      // listen to the back button to validate etc
      $('#ten-breaths-back').on('click', function(){
 
-         // fixme: stop the GPS watch
-
          // FIXME - CHECK WE ARE OK TO MOVE BACK TO home page
+         
+         // 1) Is the timer running - are they breathing?
+         if(shinrinyoku.grounding_timer){
+             
+             // stop the timer
+             if(shinrinyoku.grounding_timer){
+                 clearTimeout(shinrinyoku.grounding_timer);
+                 shinrinyoku.grounding_timer = false;
+             }
+             
+             // forget the survey
+             sysurvey = null;
+
+             // stop the gps watcher 
+             shinrinyoku.stopGps();             
+             
+         }
+         
+         console.log(sysurvey);
+         
+         // 2) Have they finished and don't want to save?
+         if(sysurvey.ten_breaths_completed){
+             $('#ten-breaths-save-popup').popup('open');
+          }else{
+             // go to the home page
+             $("body").pagecontainer("change", "#home", {
+                 transition: 'slide',
+                 reverse: true,
+             });
+         }
+         
+
+     });
+     
+     $('#sy-photo-take button').on('click', function(){
+         
+         // get out of here if you don't have a camera
+         if(typeof Camera === 'undefined'){
+             alert('Sorry. There is no camera access');
+             return;
+         }
+         
+         navigator.camera.getPicture(
+             shinrinyoku.onPhotoSuccess,
+             shinrinyoku.onPhotoError, 
+             { 
+               quality: 75,
+               destinationType: Camera.DestinationType.FILE_URI,
+               sourceType: Camera.PictureSourceType.CAMERA,
+               allowEdit: false,
+               correctOrientation: true,
+               encodingType: Camera.EncodingType.JPEG,
+               targetWidth: 1024,
+               targetHeight: 1024,
+               saveToPhotoAlbum: true
+             }
+             );
+         
+     })
+     
+     $('#sy-photo').on('click', function(){
+         
+         // write it to the survey object
+         sysurvey.photo = false;
+
+         // display it.
+         $('#sy-photo').hide('slow');
+         $('#sy-photo img').attr('src', "");
+         $('#sy-photo-take').show();
+         
+     });
+     
+     $('#ten-breaths-popup-discard').on('click', function(){
+         // forget the survey
+         sysurvey = null;
+         // go to the home page
          $("body").pagecontainer("change", "#home", {
              transition: 'slide',
              reverse: true,
          });
-
      });
      
-     $('#ten-breaths-save').on('click', function(){
+     $('#ten-breaths-save, #ten-breaths-popup-save').on('click', function(){
 
-         // fixme: stop the GPS watch
+         // double check the gps is stopped
+         shinrinyoku.stopGps();
 
          // save the survey - 
          var now = new Date();
          sysurvey.completed = now.getTime();
          sysurvey.timezoneOffset = now.getTimezoneOffset();
          // not sure if daylight saving is always included...
+         
+         // values on the form 
+         sysurvey.textComments = $('#ten-breaths-text').val();
+         sysurvey.geolocation.manual = $('#geolocation-manual-text').val();
+         
+         // fixme - photo
 
          // add it to the outbox
          var outbox = shinrinyoku.getBox('outbox');
@@ -324,15 +537,12 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
                   reverse: true,
               });
 
-         console.log(sysurvey);
-
      });
-     
-    
      
  });
 
  // Triggered on the "to" page, before transition animation starts
+ // good to set state
  $(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
      
      // we must have a sysurvey object to use
@@ -352,242 +562,25 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
     $('#ten-breaths-text').addClass('ui-disabled');
     $('#ten-breaths-photo').addClass('ui-disabled');
     $('#ten-breaths-save').addClass('ui-disabled');
+    
+    // hide the geo fields till we stop
+    $('#sy-geolocation-auto').hide();
+    $('#sy-geolocation-auto p').html('');
+    $('#sy-geolocation-manual').hide();
+    $('#sy-geolocation-manual textarea').val('');
+    
+    // no text at start
+    $('#ten-breaths-text').val('');
+    
+    // no photo at start
+    $('#sy-photo').hide();
+    $('#sy-photo img').attr('src', '');
+    $('#sy-photo-take').show();
+    
 
     
 });
 
-
-/*
- * V I S U A L - P A G E 
- */
- 
-// Triggered when the page has been created, but before enhancement is complete
-// good to add listeners
-$(document).on('pagecreate', '#survey-visual', function(e, data) {
-    
-    // listen to the back button to validate etc
-    $('#survey-visual-done').on('click', function(){
-        
-        // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
-        sysurvey.stage++;
-        console.log('visual done');
-        $("body").pagecontainer("change", "#survey", {
-            transition: 'slide',
-            reverse: true,
-        });
-        
-    });
-    
-     //console.log("pagecreate #survey-visual");
-});
-
-// good to set state
-$(document).on('pagebeforeshow', '#survey-visual', function(e, data) {
-
-    // we should never be on this page without an active sysurvey
-    if(!sysurvey){
-       $("body").pagecontainer("change", "#survey", {
-           transition: 'slide',
-           reverse: true,
-       });         
-    }
-
-    // disable buttons till after minute has run
-    $('div#survey-visual a.sy-metric').addClass('ui-disabled');
-        
-    // reset colours
-    $('div#survey-visual a.sy-metric').parent().removeClass(function (index, css){
-        return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
-    });
-    
-    // reset numbers
-    $('div#survey-visual a.sy-metric span.ui-li-count').html('0');
-    
-    // enable the timer button
-    var button = $('div#survey-visual button.sy-sampling-minute-button');
-    button.removeClass('ui-disabled');
-    button.html(button.data('ready-text'));
-});
-
-/*
- * A U D I T O R Y - P A G E 
- */
-
- // good to add listeners
- $(document).on('pagecreate', '#survey-auditory', function(e, data) {
-    
-     // listen to the back button to validate etc
-     $('#survey-auditory-done').on('click', function(){
-
-         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
-         sysurvey.stage++;
-         console.log('auditory done');
-         $("body").pagecontainer("change", "#survey", {
-             transition: 'slide',
-             reverse: true,
-         });
-
-     });
-});
-
-// good to set state
-$(document).on('pagebeforeshow', '#survey-auditory', function(e, data) {
-    
-    // we should never be on this page without an active sysurvey
-    if(!sysurvey){
-       $("body").pagecontainer("change", "#survey", {
-           transition: 'slide',
-           reverse: true,
-       });         
-    }
-    
-    // disable buttons till after minute has run
-    $('div#survey-auditory a.sy-metric').addClass('ui-disabled');
-    
-    // reset colours
-    $('div#survey-auditory a.sy-metric').parent().removeClass(function (index, css){
-        return (css.match(/(^|\s)sy-strength-colour-.{1,2}/g) || []).join(' ');
-    });
-    
-    // reset numbers
-    $('div#survey-auditory a.sy-metric span.ui-li-count').html('0');
-    
-    // enable the timer button
-    var button = $('div#survey-auditory button.sy-sampling-minute-button');
-    button.removeClass('ui-disabled');
-    button.html(button.data('ready-text'));
-
-});
- 
-
-/*
- * E M O T I O N A L - P A G E 
- */
-$(document).on('pagecreate', '#survey-emotional', function(e, data) {
-
-    $('div#survey-emotional div.ui-content a').on('click', function(){
-    
-        // is it already clicked unclick it
-        if($(this).data('sy-tag-on') == 'true'){
-            $(this).data('sy-tag-on', 'false');
-            $(this).buttonMarkup({ icon: "" });
-        }else{
-            // click it
-            $(this).data('sy-tag-on', 'true');
-            $(this).buttonMarkup({ icon: "check", iconpos: "right"});
-        }
-        
-        // if three are checked disable the rest
-        var checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
-        if(checked.length >= 3){
-            $('div#survey-emotional div.ui-content a').not('.ui-icon-check').addClass('ui-disabled');
-        }else{
-            $('div#survey-emotional div.ui-content a').removeClass('ui-disabled');
-        }
-        
-        // get the newly checked list
-        sysurvey.tags = new Array();
-        checked = $('div#survey-emotional div.ui-content a.ui-icon-check');
-        checked.each(function(i,a){
-           sysurvey.tags.push($(a).data('sy-val'));
-        });
-        console.log(sysurvey);
-
-    });
-    
-    // listen to the back button to validate etc
-    $('#survey-emotional-done').on('click', function(){
-
-        // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
-        sysurvey.stage++;
-        console.log('emotional done');
-        $("body").pagecontainer("change", "#survey", {
-            transition: 'slide',
-            reverse: true,
-        });
-
-    });
-
-});
-
-// good to set state
-$(document).on('pagebeforeshow', '#survey-emotional', function(e, data) {
-    
-    // we should never be on this page without an active sysurvey
-    if(!sysurvey){
-       $("body").pagecontainer("change", "#survey", {
-           transition: 'slide',
-           reverse: true,
-       });
-       return;
-    }
-    
-    // the list items are arranged randomly to prevent habit ticking
-    var ul = $('ul#survey-emotional-list');
-    var li = ul.children("li");
-    li.each(function(){
-       $(this).data('random-sort', Math.random());
-    });
-    
-    li.detach().sort(function(a, b){
-        return  $(a).data('random-sort') - $(b).data('random-sort');
-    });
-    ul.append(li).listview( "refresh" );
-    
-    // keep a record of the tag order
-    sysurvey.tag_order = new Array();
-    li.each(function(index){
-       sysurvey.tag_order[index] = $(this).children('a').data('sy-val');
-    });
-    
-});
-
-/*
- * O V E R A L L - P A G E
- */
- // good to add listeners
- $(document).on('pagecreate', '#survey-overall', function(e, data) {
-     
-     // listen to the back button to validate etc
-     $('#survey-overall-done').on('click', function(evt){
-         
-         // save the location name
-         var location_name = $('#sy-location_name').val();
-         if(!location_name){
-             $('#survey-overall-no-location-name').popup('open');
-             evt.preventDefault();
-             return;
-         }
-         sysurvey.location_name = location_name;
-         
-         // fixme - do we have a GPS location.
-         
-
-         // FIXME - CHECK WE ARE OK TO MOVE BACK TO SURVEY
-         
-         
-         sysurvey.stage++;
-         $("body").pagecontainer("change", "#survey", {
-             transition: 'slide',
-             reverse: true,
-         });
-
-     });
-
-     
- });
- // good to set state
- $(document).on('pagebeforeshow', '#survey-overall', function(e, data) {
- 
-     // we should never be on this page without an active sysurvey
-     if(!sysurvey){
-        $("body").pagecontainer("change", "#survey", {
-            transition: 'slide',
-            reverse: true,
-        });         
-     }
- 
- });
  
 /*
  * S U R V E Y O R - P A G E 

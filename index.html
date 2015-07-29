@@ -216,15 +216,30 @@
                     <li  class="ui-field-contain">
                         <button href="#" id="ten-breaths-finished" class="ui-btn ui-corner-all" >Finished</button>
                     </li>
+
+                    <li id="sy-geolocation-auto" class="ui-field-contain" >
+                         <p></p>
+                    </li>
                     
+                    <li id="sy-geolocation-manual" class="ui-field-contain" >
+                         <textarea cols="40" name="geolocation-manual-text" id="geolocation-manual-text" placeholder="Please enter your location (we couldn't get it from the GPS)"></textarea>
+                    </li>
+                                        
                     <li class="ui-field-contain" >
                          <textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
                     </li>
 
-                    <li>
-                        <button id="ten-breaths-photo" class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-right" >Add Photo (optional)</button>
+                    <li id="sy-photo" data-icon="delete" ><a href="#">
+                            <img src="">
+                            <h2>Delete</h2>
+                            <p>Remove the photo (can't be undone)</p>
+                        </a>
                     </li>
-
+                    
+                    <li id="sy-photo-take">
+                        <button class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-right" >Add Photo (optional)</button>
+                    </li>
+                    
 
                     <li>
                         <button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-right" >Save</button>
@@ -254,6 +269,18 @@
                      Just do normal relaxed breathing.
                 </p>
                  <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
+             
+             <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                 <div data-role="header" data-theme="a">
+                 <h1>Save Location?</h1>
+                 </div>
+                 <div role="main" class="ui-content">
+                     <h3 class="ui-title">You haven't saved this location!</h3>
+                     <p>Do you want to save or discard the ten breaths at this location? This can't be undone.</p>
+                     <a href="#" id="ten-breaths-popup-discard" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >Discard</a>
+                     <a href="#" id="ten-breaths-popup-save" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">Save</a>
+                 </div>
              </div>
              
              <div data-role="popup" id="survey-grounding-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
