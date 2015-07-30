@@ -10,42 +10,12 @@ shinrinyoku.submit_uri = 'http://tenbreaths.rbge.info/submit/index.php';
 shinrinyoku.min_breaths_duration = 30;
 shinrinyoku.max_breaths_duration = 90;
 
-/*
- * The survey object class
- */
-function ShinrinYokuSurvey(){
-    
-    // give it a uuid
-    this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+shinrinyoku.getRandomId = function(){
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
     });
-    
-    this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
-    this.complete = false; // time they finished survey and clicked save
-    this.groundings = new Array();
-    this.geolocation = new Object();
-    
-    // tag the creation time
-    var now = new Date();
-    this.started = now.getTime();
-
-    // find the location
-    shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
-        shinrinyoku.onGeoSuccess,
-        shinrinyoku.onGeoError,
-        {
-            enableHighAccuracy: true, 
-            maximumAge        : 10 * 1000, 
-            timeout           : 10 * 1000
-        }
-        );
-    
-    // set a timeout to clear the watch handler after 2 minutes no matter what - we don't want to flatten their battery
-    setTimeout(shinrinyoku.stopGps, 1000 * 60 * 2 );
-    
 }
-var sysurvey = null;
 
 shinrinyoku.onGeoSuccess = function(position){
 
@@ -176,8 +146,7 @@ shinrinyoku.submit = function(survey_ids){
         var survey_string = JSON.stringify(survey);
         
         // the surveyor object
-        var surveyor = window.localStorage.getItem('surveyor');
-        var surveyor_string = JSON.stringify(surveyor);
+        var surveyor_string = window.localStorage.getItem('surveyor');
         
         // post it to the server
  
@@ -186,31 +155,21 @@ shinrinyoku.submit = function(survey_ids){
             type: 'POST',
             data: {
                 'survey': survey_string,
-                'surveyor': surveyor_string
+                'surveyor': surveyor_string,
+                'api_key': window.localStorage.getItem('api_key')
             },
             success: function(data){
                 console.log(data);
                 console.log("About to submit photo");
                 shinrinyoku.submitPhoto(survey);
-                alert('Data saved');
+                alert(data);
             },
             error: function(error){
             	console.log(error);
-            	alert('An error!');
+            	alert('An error! ' . error);
             }
         });
  
-        /*
-        $.post(
-            shinrinyoku.submit_uri,
-            "survey=banana&surveyor=cake",
-            function(data){
-                console.log(data);
-                alert('Data saved');
-                shinrinyoku.submitPhoto(survey);
-            }
-        );
-        */
         
         // move from the out to history boxes
         for(var j=0; j < outbox.length; j++){
@@ -264,15 +223,54 @@ shinrinyoku.submitPhoto = function(survey){
         console.log('No photo to submit.')
     }
     
+}
 
+/*
+ * The survey object class
+ */
+function ShinrinYokuSurvey(){
+    
+    // give it a uuid
+    this.id = shinrinyoku.getRandomId();
+    
+    this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
+    this.complete = false; // time they finished survey and clicked save
+    this.groundings = new Array();
+    this.geolocation = new Object();
+    
+    // tag the creation time
+    var now = new Date();
+    this.started = now.getTime();
+
+    // find the location
+    shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
+        shinrinyoku.onGeoSuccess,
+        shinrinyoku.onGeoError,
+        {
+            enableHighAccuracy: true, 
+            maximumAge        : 10 * 1000, 
+            timeout           : 10 * 1000
+        }
+        );
+    
+    // set a timeout to clear the watch handler after 2 minutes no matter what - we don't want to flatten their battery
+    setTimeout(shinrinyoku.stopGps, 1000 * 60 * 2 );
     
 }
+var sysurvey = null;
+
 
 /*
  * W H O L E - D O C U M E N T 
  */
  $( function() {
-   
+     
+     // we have a unique key for this install
+     var api_key = window.localStorage.getItem('api_key');
+    if(!api_key){
+        window.localStorage.setItem('api_key', shinrinyoku.getRandomId());
+    }
+
      // listen for popup calls across multiple pages
      $('a.sy-metric').on('click', function(){
          $( "#strength-popup" ).data('sy-metric-anchor', $(this));
