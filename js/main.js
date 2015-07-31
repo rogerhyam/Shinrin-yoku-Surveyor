@@ -35,7 +35,9 @@ shinrinyoku.onGeoSuccess = function(position){
         var lon = Math.abs(position.coords.longitude).toFixed(4) + '&deg; W';
     }
 
-    $('#sy-geolocation-auto p').html('<strong>Position:</strong> ' + lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)');
+    sysurvey.geolocation.display_string = '<strong>Position:</strong> ' + lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)';
+
+    $('#sy-geolocation-auto p').html(sysurvey.geolocation.display_string);
     
     // save the coordinates - need to make a serialisable object
     sysurvey.geolocation.longitude = position.coords.longitude;
@@ -147,6 +149,7 @@ shinrinyoku.submit = function(survey_ids){
         
         // the surveyor object
         var surveyor_string = window.localStorage.getItem('surveyor');
+        var surveyor = JSON.parse(surveyor_string);
         
         // post it to the server
  
@@ -158,35 +161,40 @@ shinrinyoku.submit = function(survey_ids){
                 'surveyor': surveyor_string,
                 'api_key': window.localStorage.getItem('api_key')
             },
-            success: function(data){
-                console.log(data);
+            success: function(data, textStatus, xhr){
+
                 console.log("About to submit photo");
                 shinrinyoku.submitPhoto(survey);
-                alert(data);
+                
+                // move from the out to history boxes
+                for(var j=0; j < outbox.length; j++){
+                    if(outbox[j].id == survey_id){
+                        history.push(outbox[i]);
+                        outbox.splice(j, 1);
+                        break;
+                    }
+                }
+                // remove the list item
+                $('#'+ survey_id).hide();
+                
+                shinrinyoku.saveBox('history', history);
+                shinrinyoku.saveBox('outbox', outbox);
+                
             },
-            error: function(error){
-            	console.log(error);
-            	alert('An error! ' . error);
+            error: function(xhr, textStatus){
+                if(xhr.status == 409){
+                    $('#display-name-clash h3 span').html(surveyor.display_name);
+                    $('#display-name-clash').popup('open');
+                    // alert('Sorry. The display name ' + surveyor.display_name + ' is already in use.');
+                }else{
+                    alert(xhr.statusText); // fixme: better error catching
+                }
             }
         });
- 
         
-        // move from the out to history boxes
-        for(var j=0; j < outbox.length; j++){
-            if(outbox[j].id == survey_id){
-                history.push(outbox[i]);
-                outbox.splice(j, 1);
-                break;
-            }
-        }
-        
-        // remove the list item
-        $('#'+ survey_id).hide();
+
              
     }
-    
-    shinrinyoku.saveBox('history', history);
-    shinrinyoku.saveBox('outbox', outbox);
     
 }
 
@@ -575,7 +583,6 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
     $('#sy-photo img').attr('src', '');
     $('#sy-photo-take').show();
     
-
     
 });
 
@@ -599,6 +606,15 @@ $(document).on('pagebeforeshow', '#home', function(e, data) {
      // listen for changing select lists
      $('select.surveyor_field').on('change', function () {
         shinrinyoku.saveSurveyor();
+     });
+     
+     // finished button
+     $('#surveyor-finished-button').on('click', function(){
+         $("body").pagecontainer("change", "#home", {
+                  transition: 'slide',
+                  reverse: true,
+                  reloadPage: false
+        });
      });
  
  });
@@ -648,6 +664,23 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
         
     });
     
+    // display name clash popup
+    $('#display-name-clash-button').on('click', function(){
+       
+       // close the popup
+       $('#display-name-clash').popup('close');
+       
+       // send them to the surveyor page to change it
+       $("body").pagecontainer("change", "#surveyor", {
+           transition: 'slide',
+           reverse: false,
+       });
+       
+       // focus the display name
+       $('#display_name').focus();
+        
+    });
+    
 });
 
 // good to set state
@@ -668,16 +701,19 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         var a1 = $('<a href="#"></a>');
         li.append(a1);
         a1.data('sy-survey-id', survey.id);
+        
                 
         var h3 = $('<h3></h3>');
-        if(survey.name)h3.html(survey.name);
-        else h3.html('~ no name ~');
-        
+        var d = new Date(survey.started);
+        h3.html(d.toString(''));
         a1.append(h3);
         
         var p = $('<p></p>');
-        var d = new Date(survey.started);
-        p.html(d.toString());
+        if(survey.geolocation.display_string){
+            p.html(survey.geolocation.display_string);
+        }else if(survey.geolocation.manual){
+            p.html('<strong>Location:</strong> ' + survey.geolocation.manual);
+        }
         a1.append(p);
         
         var a2 = $('<a href="#" class="sy-survey-delete" ></a>');
@@ -741,6 +777,8 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
      for(i = 0 ; i< history.length; i++){
 
          var survey = history[i];
+
+         if(survey == null) continue;
        
          console.log(survey);
 

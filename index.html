@@ -24,6 +24,7 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
         
         <title>Shinrin-Yoku</title>
         
@@ -91,7 +92,7 @@
                          </a>
                      </li>
                      <li data-icon="action" >
-                         <a href="#">
+                         <a href="#" onclick="var ref = window.open('http://tenbreaths.rbge.info', '_system');">
                              <h2>The Map</h2>
                              <p>A map of all the results submitted by all surveyors.</p>
                          </a>
@@ -131,14 +132,9 @@
             </div>
             
             <div role="main" class="ui-content">
-                
-                <form>
+
                 <ul data-role="listview" data-inset="true">
                     <li data-role="list-divider">Contact details (private)</li>
-                    <li class="ui-field-contain">
-                        <label for="real_name">Real Name:</label>
-                        <input name="real_name" id="real_name" class="surveyor_field" value="" data-clear-btn="true" type="text">
-                    </li>
                     <li class="ui-field-contain">
                         <label for="email">Email:</label>
                         <input name="email" id="email" class="surveyor_field" value="" data-clear-btn="true" type="text">
@@ -180,10 +176,11 @@
                         <label for="about_me">Other stuff:</label>
                         <textarea cols="40" rows="8" name="about_me" id="about_me"  class="surveyor_field" placeholder="Anything else you would like to say about yourself."></textarea>
                     </li>
-                    
+                    <li class="ui-field-contain">
+                        <button id="surveyor-finished-button" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right" >Finished</button>
+                    </li>                    
                 </ul>
-                </form>
-                
+
             </div><!-- end content -->
             
             <div data-role="popup" id="surveyor-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
@@ -317,6 +314,18 @@
 
              <div data-role="footer" data-position="fixed" >
                  <a href="#" id="submit-all" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Submit All</a>
+             </div>
+
+             <div data-role="popup" id="display-name-clash" data-overlay-theme="b" data-theme="b" data-dismissible="false" >
+                 <div data-role="header" data-theme="a">
+                 <h1>Display Name</h1>
+                 </div>
+                 <div role="main" class="ui-content">
+                     <h3 class="ui-title">Sorry the name '<span></span>' is already in use.</h3>
+                     <p>Please change your display name to submit your records.</p>
+                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancel</a>
+                     <a href="#" id="display-name-clash-button" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">OK</a>
+                 </div>
              </div>
              
              <div data-role="popup" id="delete-confirm" data-overlay-theme="b" data-theme="b" data-dismissible="false" >
