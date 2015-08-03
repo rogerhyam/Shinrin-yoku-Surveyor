@@ -30,6 +30,7 @@
         
         <!-- style -->
         <link rel="stylesheet" href="js/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="style/flat/jquery.mobile.flatui.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
         <link rel="stylesheet" href="style/main.css" type="text/css" media="screen" title="no title" charset="utf-8">
         
         <!-- scripts -->
@@ -39,101 +40,170 @@
         <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
         
     </head>
-    <body>
-        <!-- Start of first page -->
-        <div data-role="page" id="home">
+    <body >
+        
+        <!-- left panel -->
+        <div data-role="panel" id="nav-panel" data-position="left" data-display="overlay" data-theme="b">
+                <ul data-role="listview" data-inset="false" >
+                    <li data-role="list-divider" data-theme="a" >Menu</li>
+                    <li>
+                    <a href="#ten-breaths" data-transition="slide">
+                       <h2>Take Ten Breaths</h2>
+                    </a>
+                    </li>
+                    <li>
+                       <a href="#surveyor" data-transition="slide">
+                           <h2>About You</h2>
+                       </a>
+                    </li>
+                    <li>
+                       <a href="#outbox" data-transition="slide">
+                           <h2>Outbox</h2>
+                           <span class="ui-li-count" id="sy-outbox-count" >0</span>
+                       </a>
+                    </li>
+                    <li>
+                       <a href="#history" data-transition="slide">
+                           <h2>History</h2>
+                           <span class="ui-li-count" id="sy-history-count" >0</span>
+                       </a>
+                    </li>
+                    <li>
+                       <a href="#about" data-transition="slide">
+                           <h2>About Us</h2>
+                       </a>
+                    </li>
+                    <li data-icon="action" >
+                     <a href="#">
+                         <h2>Tutorial</h2>
+                     </a>
+                    </li>
+                    <li data-icon="action" >
+                     <a href="#" onclick="var ref = window.open('http://tenbreaths.rbge.info', '_system');">
+                         <h2>The Map</h2>
+                     </a>
+                    </li>
+                </ul>
+                
+    	</div><!-- /left panel -->
+
+         <!-- T E N  - B R E A T H S -->
+        <div data-role="page" id="ten-breaths" data-theme="b">
 
             <div data-role="header" data-position="fixed">
-                <a href="#about" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >About</a>
-                <h1>Shinrin-Yoku</h1>
-                <a href="#help" data-transition="slide" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
-            </div><!-- /header -->
+                <a href="" id="ten-breaths-back" data-icon="bullets" data-role="button">Menu</a>
+                <h1>Ten Breaths</h1>
+                <a href="#survey-grounding-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
+            </div>
 
-            <div role="main" class="ui-content">
-                
-                <ul data-role="listview" data-inset="true">
-                    <li data-role="list-divider">Survey Tool</li>
-                    <li>
-                        <a href="#ten-breaths" data-transition="slide">
-                            <h2>Take Ten Breaths</h2>
-                            <p>Add this place to the ten breaths map.</p>
-                        </a>
+             <div role="main" class="ui-content">
+
+                <ul data-role="listview" data-inset="true" >
+
+                    <li  class="ui-field-contain">
+                        <button href="#" id="ten-breaths-start" class="ui-btn ui-corner-all" >Start</button>
                     </li>
-                    <li>
-                        <a href="#surveyor" data-transition="slide">
-                            <h2>About You</h2>
-                            <p>Information on the surveyor.</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#outbox" data-transition="slide">
-                            <h2>Outbox</h2>
-                            <p>Surveys completed but not submitted.</p>
-                            <span class="ui-li-count" id="sy-outbox-count" >0</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#history" data-transition="slide">
-                            <h2>History</h2>
-                            <p>Surveys submitted from this device.</p>
-                            <span class="ui-li-count" id="sy-history-count" >0</span>
-                        </a>
+                    <li  class="ui-field-contain">
+                        <button href="#" id="ten-breaths-finished" class="ui-btn ui-corner-all" >Finished</button>
                     </li>
 
-                    
+                    <li id="sy-geolocation-auto" class="ui-field-contain" >
+                         <p></p>
+                    </li>
+
+                    <li id="sy-geolocation-manual" class="ui-field-contain" >
+                         <textarea cols="40" name="geolocation-manual-text" id="geolocation-manual-text" placeholder="Please enter your location (we couldn't get it from the GPS)"></textarea>
+                    </li>
+
+                    <li class="ui-field-contain" >
+                         <textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
+                    </li>
+
+                    <li id="sy-photo" data-icon="delete" ><a href="#">
+                            <img src="">
+                            <h2>Delete</h2>
+                            <p>Remove the photo (can't be undone)</p>
+                        </a>
+                    </li>
+
+                    <li id="sy-photo-take">
+                        <button id="ten-breaths-photo" class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-right" >Add Photo (optional)</button>
+                    </li>
+
+
+                    <li>
+                        <button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-right" >Save</button>
+                    </li>
                 </ul>
-                
-                 <ul data-role="listview" data-inset="true">
-                     <li data-role="list-divider">On-line Resources</li>
-                     <li data-icon="action" >
-                         <a href="#">
-                             <h2>Tutorial</h2>
-                             <p>A video on Shinrin-Yoku and how to do a survey.</p>
-                         </a>
-                     </li>
-                     <li data-icon="action" >
-                         <a href="#" onclick="var ref = window.open('http://tenbreaths.rbge.info', '_system');">
-                             <h2>The Map</h2>
-                             <p>A map of all the results submitted by all surveyors.</p>
-                         </a>
-                     </li>
-                </ul>
-                
-            </div><!-- /content -->
 
-        </div><!-- /page -->
 
-        <!-- About Page -->
-        <div data-role="page" id="about">
+             </div>
 
-        	<div data-role="header" data-position="fixed">
-        		<h1>About</h1>
-        	    <a href="#home" data-transition="slide" data-icon="arrow-r" data-iconpos="right" class="ui-btn-right" >Home</a>
-        	</div><!-- /header -->
+             <div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Breathing Slow</h3>
+                 <p>
+                    You have been conscious breathing for more than 90 seconds which is a bit slow.  
+                    Perhaps you lost count?
+                    Try again.
+                    Just do normal relaxed breathing.
+                </p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
 
-        	<div role="main" class="ui-content">
-        		<p>I'm the second in the source order so I'm hidden when the page loads. I'm just shown if a link that references my id is beeing clicked.</p>
-        		<p><a href="#foo">Back to foo</a></p>
-        	</div><!-- /content -->
+             <div data-role="popup" id="survey-grounding-fast" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Breathing Fast</h3>
+                 <p>
+                     You have been conscious breathing for less than 30 seconds which is a little fast.
+                     Perhaps you should slow down and try again.
+                     Try again.
+                     Just do normal relaxed breathing.
+                </p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
 
-        	<div data-role="footer">
-        		<h4>Page Footer</h4>
-        	</div><!-- /footer -->
-        </div><!-- /page -->
-        
+             <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                 <div data-role="header" data-theme="a">
+                 <h1>Save Location?</h1>
+                 </div>
+                 <div role="main" class="ui-content">
+                     <h3 class="ui-title">You haven't saved this location!</h3>
+                     <p>Do you want to save or discard the ten breaths at this location? This can't be undone.</p>
+                     <a href="#" data-rel="back" id="ten-breaths-popup-discard" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >Discard</a>
+                     <a href="#" data-rel="back" id="ten-breaths-popup-save" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">Save</a>
+                 </div>
+             </div>
+
+             <div data-role="popup" id="ten-breaths-thanks-popup" data-transition="flip" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                  <div data-role="header" data-theme="a">
+                  <h1>Thank You</h1>
+                  </div>
+                  <div role="main" class="ui-content">
+                      <p>Thanks for mapping another time and place of nourishment and healing.</p>
+                      <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >OK</a>
+                  </div>
+              </div>
+
+             <div data-role="popup" id="survey-grounding-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Grounding Help</h3>
+                 <p>We use this to help us arrive in the location</p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+             </div>
+
+        </div>
+    
         
         <!-- Surveyor Page -->
-        <div data-role="page" id="surveyor">
+        <div data-role="page" id="surveyor" data-theme="b" >
             
             <div data-role="header" data-position="fixed">
-                <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
+                <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>About You</h1>
                 <a href="#surveyor-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
             
             <div role="main" class="ui-content">
 
-                <ul data-role="listview" data-inset="true">
+                <ul data-role="listview" data-inset="true" data-theme="b">
                     <li data-role="list-divider">Contact details (private)</li>
                     <li class="ui-field-contain">
                         <label for="email">Email:</label>
@@ -142,7 +212,7 @@
                     
                 </ul>
                 
-                <ul data-role="listview" data-inset="true">
+                <ul data-role="listview" data-inset="true" data-theme="b">
                     <li data-role="list-divider">Profile (public)</li>
                     <li class="ui-field-contain">
                         <label for="name2">Display Name:</label>
@@ -193,114 +263,33 @@
             </div>
             
         </div><!-- surveyor page -->
-    
-        <!-- T E N  - B R E A T H S -->
-        <div data-role="page" id="ten-breaths">
-
-            <div data-role="header" data-position="fixed">
-                <a href="#" id="ten-breaths-back" data-icon="arrow-l" >Home</a>
-                <h1>Ten Breaths</h1>
-                <a href="#survey-grounding-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
-            </div>
-
-             <div role="main" class="ui-content">
-                
-                <ul data-role="listview" data-inset="true" >
-                
-                    <li  class="ui-field-contain">
-                        <button href="#" id="ten-breaths-start" class="ui-btn ui-corner-all" >Start</button>
-                    </li>
-                    <li  class="ui-field-contain">
-                        <button href="#" id="ten-breaths-finished" class="ui-btn ui-corner-all" >Finished</button>
-                    </li>
-
-                    <li id="sy-geolocation-auto" class="ui-field-contain" >
-                         <p></p>
-                    </li>
-                    
-                    <li id="sy-geolocation-manual" class="ui-field-contain" >
-                         <textarea cols="40" name="geolocation-manual-text" id="geolocation-manual-text" placeholder="Please enter your location (we couldn't get it from the GPS)"></textarea>
-                    </li>
-                                        
-                    <li class="ui-field-contain" >
-                         <textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
-                    </li>
-
-                    <li id="sy-photo" data-icon="delete" ><a href="#">
-                            <img src="">
-                            <h2>Delete</h2>
-                            <p>Remove the photo (can't be undone)</p>
-                        </a>
-                    </li>
-                    
-                    <li id="sy-photo-take">
-                        <button class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-right" >Add Photo (optional)</button>
-                    </li>
-                    
-
-                    <li>
-                        <button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-right" >Save</button>
-                    </li>
-                </ul>
-
-                
-             </div>
-
-             <div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
-                 <h3>Breathing Slow</h3>
-                 <p>
-                    You have been conscious breathing for more than 90 seconds which is a bit slow.  
-                    Perhaps you lost count?
-                    Try again.
-                    Just do normal relaxed breathing.
-                </p>
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
-             </div>
-             
-             <div data-role="popup" id="survey-grounding-fast" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
-                 <h3>Breathing Fast</h3>
-                 <p>
-                     You have been conscious breathing for less than 30 seconds which is a little fast.
-                     Perhaps you should slow down and try again.
-                     Try again.
-                     Just do normal relaxed breathing.
-                </p>
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
-             </div>
-             
-             <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
-                 <div data-role="header" data-theme="a">
-                 <h1>Save Location?</h1>
-                 </div>
-                 <div role="main" class="ui-content">
-                     <h3 class="ui-title">You haven't saved this location!</h3>
-                     <p>Do you want to save or discard the ten breaths at this location? This can't be undone.</p>
-                     <a href="#" id="ten-breaths-popup-discard" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >Discard</a>
-                     <a href="#" id="ten-breaths-popup-save" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">Save</a>
-                 </div>
-             </div>
-             
-             <div data-role="popup" id="survey-grounding-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
-                 <h3>Grounding Help</h3>
-                 <p>We use this to help us arrive in the location</p>
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
-             </div>
-             
-        </div>
         
-        
+        <!-- About Page -->
+        <div data-role="page" id="about" data-theme="b">
+
+        	<div data-role="header" data-position="fixed">
+        	    <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
+        		<h1>About</h1>
+        	</div><!-- /header -->
+
+        	<div role="main" class="ui-content">
+        		<p>This explains about the project and links out to other stuff...</p>
+        	</div><!-- /content -->
+
+        </div><!-- /page -->
+     
          <!-- Outbox overall Page -->
-        <div data-role="page" id="outbox">
+        <div data-role="page" id="outbox" data-theme="b">
 
             <div data-role="header" data-position="fixed">
-                <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
+                <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>Outbox</h1>
                 <a href="#outbox-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
 
              <div data-role="main" class="ui-content">
                
-                <ul data-role="listview" data-inset="false" data-split-icon="delete" data-split-theme="a"  >
+                <ul data-role="listview" data-inset="false" data-split-icon="delete" data-theme="c" data-split-theme="d"  >
                     <li>
                       <a href="#">
                        <h3>My survey</h3>
@@ -356,15 +345,15 @@
         </div>
        
          <!-- History Page -->
-        <div data-role="page" id="history" >
+        <div data-role="page" id="history" data-theme="b" >
 
             <div data-role="header" data-position="fixed">
-                <a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" >Home</a>
+                <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>History</h1>
                 <a href="#history-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
 
-             <div data-role="main" class="ui-content">
+             <div data-role="main" class="ui-content" data-theme="c">
                
                 <ul data-role="listview" data-inset="false" data-split-icon="delete" data-split-theme="a"  >
                     <li>
@@ -408,6 +397,7 @@
          <div data-role="page" id="developer">
 
          	<div data-role="header" data-position="fixed">
+         	    <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
          		<h1>Developer</h1>
          	    <a href="#home" data-transition="flip"  data-iconpos="right" class="ui-btn-right" >Close</a>
          	</div><!-- /header -->
