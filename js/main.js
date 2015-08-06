@@ -161,7 +161,9 @@ shinrinyoku.resetSurvey = function(){
 
 }
 
-shinrinyoku.submit = function(survey_ids){
+shinrinyoku.submit = function(survey_ids, silent){
+    
+    if (typeof(silent)==='undefined') silent = false;
     
     var history = shinrinyoku.getBox('history');
     var outbox = shinrinyoku.getBox('outbox');
@@ -186,7 +188,10 @@ shinrinyoku.submit = function(survey_ids){
         var surveyor = JSON.parse(surveyor_string);
         
         // post it to the server
-        $.mobile.loading( "show", { text: 'Uploading data ...', textVisible: true});
+        if(!silent){
+            $.mobile.loading( "show", { text: 'Uploading data ...', textVisible: true});
+        }
+        
         $.ajax({
             url: shinrinyoku.submit_uri,
             type: 'POST',
@@ -215,16 +220,26 @@ shinrinyoku.submit = function(survey_ids){
                 shinrinyoku.saveBox('history', history);
                 shinrinyoku.saveBox('outbox', outbox);
                 
+                // push our luck.
+                // if we are in silent mode and have just been asked to upload
+                // a single one then try and send any others that are in the outbox
+                // so this isn't triggered when we manually upload a single one from the outbox
+                if(outbox.length > 0 && silent && survey_ids.length == 1){
+                    var togo = outbox[outbox.length -1];
+                    shinrinyoku.submit([togo.id], true);
+                }
+                
             },
             error: function(xhr, textStatus){
-                $.mobile.loading( "hide" );
-                if(xhr.status == 409){
-                    $('#display-name-clash h3 span').html(surveyor.display_name);
-                    $('#display-name-clash').popup('open');
-                    // alert('Sorry. The display name ' + surveyor.display_name + ' is already in use.');
-                }else{
-                    alert(xhr.statusText); // fixme: better error catching
-                }
+                if(!silent){
+                    $.mobile.loading( "hide" );
+                    if(xhr.status == 409){
+                        $('#display-name-clash h3 span').html(surveyor.display_name);
+                        $('#display-name-clash').popup('open');
+                    }else{
+                        alert(xhr.statusText); // fixme: better error catching
+                    }
+                } // not silent
             }
         });
              
@@ -552,8 +567,6 @@ var sysurvey = new ShinrinYokuSurvey();
          // values on the form 
          sysurvey.textComments = $('#ten-breaths-text').val();
          sysurvey.geolocation.manual = $('#geolocation-manual-text').val();
-         
-         // fixme - photo
 
          // add it to the outbox
          var outbox = shinrinyoku.getBox('outbox');
@@ -562,13 +575,24 @@ var sysurvey = new ShinrinYokuSurvey();
          
          console.log(sysurvey);
 
-         // fixme - attempt silent upload         
+         // attempt silent upload of latest survey
+        setTimeout(function(){
+            
+            // the survey will have disappeared so we have to fetch it from the
+            // outbox again
+            var outbox = shinrinyoku.getBox('outbox');
+            if(outbox.length > 0){
+                var togo = outbox[outbox.length -1];
+                console.log(togo);
+                shinrinyoku.submit([togo.id], true);
+            }
         
+        }, 0);
+        
+        // say thankyou.
          setTimeout(function(){
             $('#ten-breaths-thanks-popup').popup('open');
          }, 100);
-         
-          
          
          // reset the sysurvey for the next one
          shinrinyoku.resetSurvey();
@@ -741,7 +765,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         $('#submit-all').removeClass('ui-disabled');
     }else{
         $('#submit-all').addClass('ui-disabled');
-         var li = $('<li>Outbox is empty.</li>');
+         var li = $('<li data-theme="b">Outbox is empty.</li>');
          $('div#outbox div.ui-content ul').append(li).trigger('create');
          $('div#outbox div.ui-content ul').listview().listview('refresh');
     }
@@ -815,7 +839,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          $('#clear-history-button').removeClass('ui-disabled');
      }else{
          $('#clear-history-button').addClass('ui-disabled');
-          var li = $('<li>History is empty.</li>');
+          var li = $('<li data-theme="b">History is empty.</li>');
           $('div#history div.ui-content ul').append(li).trigger('create');
           $('div#history div.ui-content ul').listview().listview('refresh');
      }
