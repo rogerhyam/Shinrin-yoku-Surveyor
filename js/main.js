@@ -3,12 +3,14 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
-shinrinyoku.developer_mode = true;
+shinrinyoku.developer_mode = false;
 shinrinyoku.submit_uri = 'http://tenbreaths.rbge.info/submit/index.php';
 
 // duration of concious breaths
-shinrinyoku.min_breaths_duration = 30;
-shinrinyoku.max_breaths_duration = 90;
+shinrinyoku.min_breaths_duration_default = 30;
+shinrinyoku.max_breaths_duration_default = 90;
+shinrinyoku.min_breaths_duration_developer = 2;
+shinrinyoku.max_breaths_duration_developer = 10;
 
 shinrinyoku.getRandomId = function(){
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -133,8 +135,11 @@ shinrinyoku.resetSurvey = function(){
     sysurvey = new ShinrinYokuSurvey();
     
     if(shinrinyoku.developer_mode){
-        shinrinyoku.min_breaths_duration = 2;
-        shinrinyoku.max_breaths_duration = 5;
+        shinrinyoku.min_breaths_duration = shinrinyoku.min_breaths_duration_developer;
+        shinrinyoku.max_breaths_duration = shinrinyoku.max_breaths_duration_developer;
+    }else{
+        shinrinyoku.min_breaths_duration = shinrinyoku.min_breaths_duration_default;
+        shinrinyoku.max_breaths_duration = shinrinyoku.max_breaths_duration_default;
     }
     
     // set the buttons ready for a new breathing exercise
@@ -209,7 +214,7 @@ shinrinyoku.submit = function(survey_ids, silent){
                 // move from the out to history boxes
                 for(var j=0; j < outbox.length; j++){
                     if(outbox[j].id == survey_id){
-                        history.push(outbox[i]);
+                        history.push(outbox[j]);
                         outbox.splice(j, 1);
                         break;
                     }
@@ -793,9 +798,9 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 
      // clear the list
      $('div#history div.ui-content ul').empty();
-
-     var history = shinrinyoku.getBox('history');
      
+     var history = shinrinyoku.getBox('history');
+
      for(i = 0 ; i< history.length; i++){
 
          var survey = history[i];
@@ -811,21 +816,25 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          var a1 = $('<a href="#"></a>');
          li.append(a1);
          a1.data('sy-survey-id', survey.id);
-         
-         
+
 
          var h3 = $('<h3></h3>');
-         if(survey.name) h3.html(survey.name);
-         else h3.html('banana');
+         var d = new Date(survey.started);
+         h3.html(d.toString(''));
          a1.append(h3);
 
          var p = $('<p></p>');
-         var d = new Date(survey.started);
-         p.html(d.toString());
+         if(survey.geolocation.display_string){
+          p.html(survey.geolocation.display_string);
+         }else if(survey.geolocation.manual){
+          p.html('<strong>Location:</strong> ' + survey.geolocation.manual);
+         }
          a1.append(p);
-
+        
          // listen for view item request
-         a1.on('click', function(){        
+         a1.on('click', function(){      
+             
+            // FIXME - MAKE THIS A LINK TO THE PLACE ON THE MAP  
             console.log("takes you to that place..");
          });
 
@@ -896,6 +905,10 @@ $(document).on('pagecreate', '#about', function(e, data) {
     $('#developer-save-button').on('click', function(){
         shinrinyoku.developer_mode = $('#developer-mode').prop('checked');
         shinrinyoku.submit_uri = $('#developer-submit-uri').val();
+         $("body").pagecontainer("change", "#about", {
+                  transition: 'flip',
+                  reverse: true
+        });
     });
      
  });
