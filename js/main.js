@@ -77,6 +77,51 @@ shinrinyoku.stopGps = function(){
     }
 }
 
+
+shinrinyoku.onMoveSuccess = function(acceleration){
+	// console.log('Acceleration Z: ' + acceleration.z + ' Timestamp: '      + acceleration.timestamp );
+	
+	var grounding = sysurvey.groundings[sysurvey.groundings.length - 1];
+	
+	// if this is the first breathing record for this grounding run 
+	// NOTE that a breath here is a an in-breath or out-breath but from the point of view of the 
+	// user an breath is "all the way in and all the way out". 
+	if(!grounding.breaths){
+		grounding.breaths = [{started: acceleration.timestamp, breathing_in: acceleration.z < 0 }];
+	}else{
+		
+		var last_breath = grounding.breaths[grounding.breaths.length -1];
+		
+		// if we have changed direction of breath then create a new breath
+		if (last_breath.breathing_in != (acceleration.z < 0)){
+			
+			var breath_count = grounding.breaths.push({started: acceleration.timestamp, breathing_in: acceleration.z < 0 });
+			
+			console.log("Breath count: " + breath_count + ( acceleration.z > 0 ? ' Breathing OUT' : ' Breathing IN' ) );
+			if(breath_count > 20){
+                if(navigator.vibrate) navigator.vibrate([300]);
+				shinrinyoku.stopBreathing();
+			}
+		
+		}
+		
+	}
+	
+}
+
+shinrinyoku.onMoveError = function(error){
+	console.log(error);
+	shinrinyoku.stopMove();
+}
+
+shinrinyoku.stopMove = function(){
+	if(shinrinyoku.move_watcher_handle){
+		navigator.accelerometer.clearWatch(shinrinyoku.move_watcher_handle);
+		shinrinyoku.move_watcher_handle = false;
+	}
+}
+
+
 shinrinyoku.onPhotoSuccess = function(imageData){
     
     // write it to the survey object
@@ -296,6 +341,127 @@ shinrinyoku.submitPhoto = function(survey, silent){
     
 }
 
+shinrinyoku.startBreathing = function(){
+         
+         var d = new Date();
+         
+         // if we are already running then cancel and return
+         if(shinrinyoku.grounding_timer){
+             sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             $('#ten-breaths-start').text('Start');
+             $('#ten-breaths-start').blur();
+             clearTimeout(shinrinyoku.grounding_timer);
+             shinrinyoku.grounding_timer = false;
+			 shinrinyoku.stopMove();
+             return;
+         }
+         
+         // Start them off
+         if(sysurvey.groundings.length == 0) sysurvey.startRecording();
+         sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
+         
+         $('#ten-breaths-finished').removeClass('ui-disabled');
+         $('#ten-breaths-start').text('Cancel');
+         $('#ten-breaths-start').blur();
+         
+         // start the timer to cancel if they fall asleep
+         shinrinyoku.grounding_timer = setTimeout(function(){
+                
+                $('#survey-grounding-slow').popup('open');
+                
+                $('#ten-breaths-finished').addClass('ui-disabled');
+                $('#ten-breaths-start').text('Start');
+                shinrinyoku.ten_breaths_running = false;               
+
+                if(navigator.vibrate){
+                    navigator.vibrate([300,500,300]);
+                }
+                
+                // we should have got their position by now
+                shinrinyoku.stopGps();
+                
+             }, shinrinyoku.max_breaths_duration * 1000);
+			 
+		// watch for the movement of the phone to count their breaths
+		if(navigator.accelerometer){
+	 		shinrinyoku.move_watcher_handle = navigator.accelerometer.watchAcceleration(
+	 			shinrinyoku.onMoveSuccess,
+	 			shinrinyoku.onMoveError,
+	 			{ frequency: 100 }
+	 		);
+		}
+         
+         
+}
+
+shinrinyoku.stopBreathing = function(){
+         
+         // stop the breath timer
+         if(shinrinyoku.grounding_timer){
+             clearTimeout(shinrinyoku.grounding_timer);
+             shinrinyoku.grounding_timer = false;
+         }
+		 
+		 // stop listening to the phone movement
+		 shinrinyoku.stopMove();
+         
+         var d = new Date();
+         var session = sysurvey.groundings[sysurvey.groundings.length - 1];
+         session.finished = d.getTime();
+         var duration = session.finished - session.started;
+         duration = duration / 1000; // seconds is easier
+         
+         /*
+         Respiratory rate: A person's respiratory rate is the number of breaths you take per minute. 
+         The normal respiration rate for an adult at rest is 12 to 20 breaths per minute.
+         A respiration rate under 12 or over 25 breaths per minute while resting is considered abnormal.
+         
+         therefore a breath should take between 5 seconds and 2.5 seconds
+         
+         So they should do 10 breaths between 25 and 50 seconds. Round it to 30 - 90 secs (for the very slow)
+         
+         */
+         
+         // too quick
+         if (duration < shinrinyoku.min_breaths_duration){
+             session.toofast = true;   
+             $('#survey-grounding-fast').popup('open');   
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             $('#ten-breaths-start').text('Start');
+         }else{
+             
+             sysurvey.ten_breaths_completed = true;
+             
+             // they are ready to save..
+             $('#ten-breaths-text').removeClass('ui-disabled');
+             $('#ten-breaths-photo').removeClass('ui-disabled');
+             $('#ten-breaths-save').removeClass('ui-disabled');
+             $('#ten-breaths-start').text('Start');
+             $('#ten-breaths-start').addClass('ui-disabled');
+             $('#ten-breaths-finished').addClass('ui-disabled');
+             
+             // hopefully we have a position by now - if so we show it
+             // if not we ask them to enter one
+             
+             console.log(sysurvey);
+             
+             if(sysurvey.geolocation.error){
+                 $('#sy-geolocation-auto').hide();
+                 $('#sy-geolocation-manual').show();
+                 $('#sy-geolocation-manual textarea').focus();
+             }else{
+                 $('#sy-geolocation-manual').hide();
+                 $('#sy-geolocation-auto').show();
+                 //$('#ten-breaths-text').focus();
+             }
+             
+             shinrinyoku.stopGps();
+             
+         }
+
+ }
+
 /*
  * The survey object class
  */
@@ -384,114 +550,8 @@ var sysurvey = new ShinrinYokuSurvey();
 
      console.log("pagecreate #ten-breaths");
     
-     $('#ten-breaths-start').on('click', function(){
-         
-         var d = new Date();
-         
-         // if we are already running then cancel and return
-         if(shinrinyoku.grounding_timer){
-             sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
-             $('#ten-breaths-start').blur();
-             clearTimeout(shinrinyoku.grounding_timer);
-             shinrinyoku.grounding_timer = false;
-             return;
-         }
-         
-         // Start them off
-         if(sysurvey.groundings.length == 0) sysurvey.startRecording();
-         sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
-         
-         $('#ten-breaths-finished').removeClass('ui-disabled');
-         $('#ten-breaths-start').text('Cancel');
-         $('#ten-breaths-start').blur();
-         
-         // start the timer to cancel if they fall asleep
-         shinrinyoku.grounding_timer = setTimeout(function(){
-                
-                $('#survey-grounding-slow').popup('open');
-                
-                $('#ten-breaths-finished').addClass('ui-disabled');
-                $('#ten-breaths-start').text('Start');
-                shinrinyoku.ten_breaths_running = false;               
-
-                if(navigator.vibrate){
-                    navigator.vibrate([300,500,300]);
-                }
-                
-                // we should have got their position by now
-                shinrinyoku.stopGps();
-                
-             }, shinrinyoku.max_breaths_duration * 1000);
-         
-         
-     });
-     
-    
-     $('#ten-breaths-finished').on('click', function(){
-         
-         // stop the breath timer
-         if(shinrinyoku.grounding_timer){
-             clearTimeout(shinrinyoku.grounding_timer);
-             shinrinyoku.grounding_timer = false;
-         }
-         
-         var d = new Date();
-         var session = sysurvey.groundings[sysurvey.groundings.length - 1];
-         session.finished = d.getTime();
-         var duration = session.finished - session.started;
-         duration = duration / 1000; // seconds is easier
-         
-         /*
-         Respiratory rate: A person's respiratory rate is the number of breaths you take per minute. 
-         The normal respiration rate for an adult at rest is 12 to 20 breaths per minute.
-         A respiration rate under 12 or over 25 breaths per minute while resting is considered abnormal.
-         
-         therefore a breath should take between 5 seconds and 2.5 seconds
-         
-         So they should do 10 breaths between 25 and 50 seconds. Round it to 30 - 90 secs (for the very slow)
-         
-         */
-         
-         // too quick
-         if (duration < shinrinyoku.min_breaths_duration){
-             session.toofast = true;   
-             $('#survey-grounding-fast').popup('open');   
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
-         }else{
-             
-             sysurvey.ten_breaths_completed = true;
-             
-             // they are ready to save..
-             $('#ten-breaths-text').removeClass('ui-disabled');
-             $('#ten-breaths-photo').removeClass('ui-disabled');
-             $('#ten-breaths-save').removeClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
-             $('#ten-breaths-start').addClass('ui-disabled');
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             
-             // hopefully we have a position by now - if so we show it
-             // if not we ask them to enter one
-             
-             console.log(sysurvey);
-             
-             if(sysurvey.geolocation.error){
-                 $('#sy-geolocation-auto').hide();
-                 $('#sy-geolocation-manual').show();
-                 $('#sy-geolocation-manual textarea').focus();
-             }else{
-                 $('#sy-geolocation-manual').hide();
-                 $('#sy-geolocation-auto').show();
-                 //$('#ten-breaths-text').focus();
-             }
-             
-             shinrinyoku.stopGps();
-             
-         }
-
-     });
+     $('#ten-breaths-start').on('click', shinrinyoku.startBreathing);
+     $('#ten-breaths-finished').on('click', shinrinyoku.stopBreathing);
      
      // listen to the menu button to validate etc
      $('#ten-breaths-back').on('click', function(){
