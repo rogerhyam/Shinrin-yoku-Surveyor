@@ -4,7 +4,13 @@
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
 shinrinyoku.developer_mode = false;
-shinrinyoku.submit_uri = 'http://tenbreaths.rbge.info/submit/index.php';
+
+// two different sites we could submit to
+shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
+shinrinyoku.submit_uri_dev = 'https://ten-breaths-server-rogerhyam.c9.io/submit/index.php';
+
+// default to the live site
+shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
 
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
@@ -209,7 +215,7 @@ shinrinyoku.submit = function(survey_ids, silent){
 
                 $.mobile.loading( "hide" );
                 console.log("About to submit photo");
-                shinrinyoku.submitPhoto(survey);
+                shinrinyoku.submitPhoto(survey, silent);
                 
                 // move from the out to history boxes
                 for(var j=0; j < outbox.length; j++){
@@ -252,10 +258,12 @@ shinrinyoku.submit = function(survey_ids, silent){
     
 }
 
-shinrinyoku.submitPhoto = function(survey){
+shinrinyoku.submitPhoto = function(survey, silent){
+    
+    if (typeof(silent)==='undefined') silent = false;
     
     if(survey.photo){
-        $.mobile.loading( "show", { text: 'Uploading photo ...', textVisible: true});
+        if(!silent) $.mobile.loading( "show", { text: 'Uploading photo ...', textVisible: true});
         var options = new FileUploadOptions();
         options.fileKey = "file";
         options.fileName = survey.id + '.jpg';
@@ -385,6 +393,7 @@ var sysurvey = new ShinrinYokuSurvey();
              sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
              $('#ten-breaths-finished').addClass('ui-disabled');
              $('#ten-breaths-start').text('Start');
+             $('#ten-breaths-start').blur();
              clearTimeout(shinrinyoku.grounding_timer);
              shinrinyoku.grounding_timer = false;
              return;
@@ -396,6 +405,7 @@ var sysurvey = new ShinrinYokuSurvey();
          
          $('#ten-breaths-finished').removeClass('ui-disabled');
          $('#ten-breaths-start').text('Cancel');
+         $('#ten-breaths-start').blur();
          
          // start the timer to cancel if they fall asleep
          shinrinyoku.grounding_timer = setTimeout(function(){
@@ -407,10 +417,14 @@ var sysurvey = new ShinrinYokuSurvey();
                 shinrinyoku.ten_breaths_running = false;               
 
                 if(navigator.vibrate){
-                    navigator.vibrate([300,500,300,500,300]);
+                    navigator.vibrate([300,500,300]);
                 }
                 
+                // we should have got their position by now
+                shinrinyoku.stopGps();
+                
              }, shinrinyoku.max_breaths_duration * 1000);
+         
          
      });
      
@@ -473,6 +487,8 @@ var sysurvey = new ShinrinYokuSurvey();
                  //$('#ten-breaths-text').focus();
              }
              
+             shinrinyoku.stopGps();
+             
          }
 
      });
@@ -480,8 +496,6 @@ var sysurvey = new ShinrinYokuSurvey();
      // listen to the menu button to validate etc
      $('#ten-breaths-back').on('click', function(){
 
-         // FIXME - CHECK WE ARE OK TO MOVE BACK TO home page
-         
          // 1) Is the timer running - are they breathing?
          if(shinrinyoku.grounding_timer){
              
@@ -490,9 +504,6 @@ var sysurvey = new ShinrinYokuSurvey();
                  clearTimeout(shinrinyoku.grounding_timer);
                  shinrinyoku.grounding_timer = false;
              }
-
-             // stop the gps watcher 
-             shinrinyoku.stopGps();             
              
              // show the menu 
              $('#nav-panel').panel('open');
@@ -507,6 +518,9 @@ var sysurvey = new ShinrinYokuSurvey();
              // just show the menu 
              $('#nav-panel').panel('open');
          }
+         
+         // stop the gps watcher 
+         shinrinyoku.stopGps();
 
      });
      
@@ -830,12 +844,15 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
           p.html('<strong>Location:</strong> ' + survey.geolocation.manual);
          }
          a1.append(p);
+         
+         var survey_url = 'http://tenbreaths.rbge.info/index.php?survey=' + survey.id;
+         a1.data('survey-url', survey_url);
         
          // listen for view item request
-         a1.on('click', function(){      
-             
-            // FIXME - MAKE THIS A LINK TO THE PLACE ON THE MAP  
-            console.log("takes you to that place..");
+         a1.on('click', function(){
+             var url = $(this).data('survey-url');
+             window.open(url, '_system');
+            console.log(url);
          });
 
          $('div#history div.ui-content ul').append(li).trigger('create');
@@ -896,19 +913,32 @@ $(document).on('pagecreate', '#about', function(e, data) {
  $(document).on('pagebeforeshow', '#developer', function(e, data) {
     
      $('#developer-mode').prop('checked', shinrinyoku.developer_mode).checkboxradio('refresh');
-     $('#developer-submit-uri').val(shinrinyoku.submit_uri);
+     
+     //set the values of the check buttons correctly
+     $('#developer-submit-uri-dev').val(shinrinyoku.submit_uri_dev);
+     $('#developer-submit-uri-live').val(shinrinyoku.submit_uri_live);
+     
+     // check the one we are using at the moment
+     $('input[name=developer-submit-uri][value="' +  shinrinyoku.submit_uri + '"]').attr('checked', true).checkboxradio("refresh");
+     console.log($('input[name=developer-submit-uri][value="' +  shinrinyoku.submit_uri + '"]'));
      
  });
  // good to add listeners
  $(document).on('pagecreate', '#developer', function(e, data) {
  
     $('#developer-save-button').on('click', function(){
+
+        console.log($('input[name=developer-submit-uri]'));
+        
         shinrinyoku.developer_mode = $('#developer-mode').prop('checked');
-        shinrinyoku.submit_uri = $('#developer-submit-uri').val();
-         $("body").pagecontainer("change", "#about", {
+        shinrinyoku.submit_uri = $('input[name=developer-submit-uri]:checked').val();
+        
+        // turn the page back
+        $("body").pagecontainer("change", "#about", {
                   transition: 'flip',
                   reverse: true
         });
+
     });
      
  });

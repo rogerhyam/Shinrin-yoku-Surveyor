@@ -29,8 +29,7 @@
         <title>Shinrin-Yoku</title>
         
         <!-- style -->
-        <link rel="stylesheet" href="js/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" type="text/css" media="screen" title="no title" charset="utf-8">
-        <link rel="stylesheet" href="style/flat/jquery.mobile.flatui.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="js/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" type="text/css" media="screen" title="no title" charset="utf-8">        
         <link rel="stylesheet" href="style/main.css" type="text/css" media="screen" title="no title" charset="utf-8">
         
         <!-- scripts -->
@@ -45,7 +44,6 @@
         <!-- left panel -->
         <div data-role="panel" id="nav-panel" data-position="left" data-display="overlay" data-theme="b">
                 <ul data-role="listview" data-inset="false" >
-                    <li data-role="list-divider" data-theme="a" >Menu</li>
                     <li>
                     <a href="#ten-breaths" data-transition="slide">
                        <h2>Take Ten Breaths</h2>
@@ -88,19 +86,19 @@
     	</div><!-- /left panel -->
 
          <!-- T E N  - B R E A T H S -->
-        <div data-role="page" id="ten-breaths" data-theme="b">
+        <div data-role="page" id="ten-breaths" data-theme="a">
 
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-theme="b" >
                 <a href="" id="ten-breaths-back" data-icon="bullets" data-role="button">Menu</a>
                 <h1>Ten Breaths</h1>
                 <a href="#survey-grounding-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
             </div>
 
-             <div role="main" class="ui-content">
+             <div role="main" class="ui-content" >
 
-                <ul data-role="listview" data-inset="true" >
+                <ul data-role="listview" data-inset="true">
 
-                    <li  class="ui-field-contain">
+                    <li  class="ui-field-contain" >
                         <button href="#" id="ten-breaths-start" class="ui-btn ui-corner-all" >Start</button>
                     </li>
                     <li  class="ui-field-contain">
@@ -161,7 +159,7 @@
                  <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
              </div>
 
-             <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+             <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="a" data-dismissible="false" style="max-width:400px;">
                  <div data-role="header" data-theme="a">
                  <h1>Save Location?</h1>
                  </div>
@@ -173,7 +171,7 @@
                  </div>
              </div>
 
-             <div data-role="popup" id="ten-breaths-thanks-popup" data-transition="flip" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+             <div data-role="popup" id="ten-breaths-thanks-popup" data-transition="flip" data-overlay-theme="b" data-theme="a" data-dismissible="false" style="max-width:400px;">
                   <div data-role="header" data-theme="a">
                   <h1>Thank You</h1>
                   </div>
@@ -193,9 +191,9 @@
     
         
         <!-- Surveyor Page -->
-        <div data-role="page" id="surveyor" data-theme="b" >
+        <div data-role="page" id="surveyor" data-theme="a" >
             
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-theme="b">
                 <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>About You</h1>
                 <a href="#surveyor-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -203,7 +201,7 @@
             
             <div role="main" class="ui-content">
 
-                <ul data-role="listview" data-inset="true" data-theme="b">
+                <ul data-role="listview" data-inset="true" data-theme="a">
                     <li data-role="list-divider">Contact details (private)</li>
                     <li class="ui-field-contain">
                         <label for="email">Email:</label>
@@ -212,7 +210,7 @@
                     
                 </ul>
                 
-                <ul data-role="listview" data-inset="true" data-theme="b">
+                <ul data-role="listview" data-inset="true" data-theme="a">
                     <li data-role="list-divider">Profile (public)</li>
                     <li class="ui-field-contain">
                         <label for="name2">Display Name:</label>
@@ -265,9 +263,9 @@
         </div><!-- surveyor page -->
         
         <!-- About Page -->
-        <div data-role="page" id="about" data-theme="b">
+        <div data-role="page" id="about" data-theme="a">
 
-        	<div data-role="header" data-position="fixed">
+        	<div data-role="header" data-position="fixed" data-theme="b">
         	    <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
         		<h1>About</h1>
         	</div><!-- /header -->
@@ -279,9 +277,9 @@
         </div><!-- /page -->
      
          <!-- Outbox overall Page -->
-        <div data-role="page" id="outbox" data-theme="b">
+        <div data-role="page" id="outbox" data-theme="a">
 
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-theme="b">
                 <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>Outbox</h1>
                 <a href="#outbox-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -305,7 +303,7 @@
                  <a href="#" id="submit-all" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Submit All</a>
              </div>
 
-             <div data-role="popup" id="display-name-clash" data-overlay-theme="b" data-theme="b" data-dismissible="false" >
+             <div data-role="popup" id="display-name-clash" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
                  <div data-role="header" data-theme="a">
                  <h1>Display Name</h1>
                  </div>
@@ -317,7 +315,7 @@
                  </div>
              </div>
              
-             <div data-role="popup" id="delete-confirm" data-overlay-theme="b" data-theme="b" data-dismissible="false" >
+             <div data-role="popup" id="delete-confirm" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
                  <div data-role="header" data-theme="a">
                  <h1>Delete Survey?</h1>
                  </div>
@@ -345,9 +343,9 @@
         </div>
        
          <!-- History Page -->
-        <div data-role="page" id="history" data-theme="b" >
+        <div data-role="page" id="history" data-theme="a" >
 
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-theme="b">
                 <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
                 <h1>History</h1>
                 <a href="#history-help" data-rel="popup" data-position-to="window" data-transition="slidedown" data-icon="info" data-iconpos="right" class="ui-btn-right" >Help</a>
@@ -370,7 +368,7 @@
                  <a href="#clear-history-confirm" id="clear-history-button" data-position-to="window" data-rel="popup" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Empty</a>
              </div>
              
-             <div data-role="popup" id="clear-history-confirm" data-overlay-theme="b" data-theme="b" data-dismissible="false" >
+             <div data-role="popup" id="clear-history-confirm" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
                  <div data-role="header" data-theme="a">
                  <h1>Clear History?</h1>
                  </div>
@@ -396,7 +394,7 @@
          <!-- Developer Page -->
          <div data-role="page" id="developer">
 
-         	<div data-role="header" data-position="fixed">
+         	<div data-role="header" data-position="fixed" data-theme="b">
          	    <a href="#nav-panel" data-icon="bullets" data-role="button">Menu</a>
          		<h1>Developer</h1>
          	    <a href="#about" data-transition="flip"  data-iconpos="right" class="ui-btn-right" >Close</a>
@@ -412,8 +410,10 @@
                         <input name="developer-mode" id="developer-mode" value="" type="checkbox">
                     </li>
                     <li class="ui-field-contain">
-                        <label for="developer-submit-uri">Submit URI:</label>
-                        <input name="developer-submit-uri" id="developer-submit-uri" value="" data-clear-btn="true" type="text">
+                        <label for="developer-submit-uri-live">Submit to LIVE</label>
+                        <input name="developer-submit-uri" id="developer-submit-uri-live" type="radio">
+                        <label for="developer-submit-uri-dev">Submit to DEV</label>
+                        <input name="developer-submit-uri" id="developer-submit-uri-dev" type="radio">
                     </li>
                     <li class="ui-field-contain">
                         <button id="developer-save-button">Save</button>
