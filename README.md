@@ -4,6 +4,7 @@ TODO
 
 * History and outbox need to display image thumbnail
 * Image thumbnail needed on ten breaths screen
+* Alerts when trying to submit without having filled in "about you"
 * Check help popup works on each screen 
 * about page initial text
 * standardise vocabulary on UI. Are we talking survey/measure/session/ten breaths what?
@@ -23,7 +24,7 @@ Required Plugins
 * cordova-plugin-statusbar 1.0.1 "StatusBar"
 * cordova-plugin-vibration 1.2.0 "Vibration"
 * cordova-plugin-whitelist 1.0.0 "Whitelist"
-
+* cordova-plugin-file-transfer 1.2.1 "File Transfer"
 
 
 Version 2
