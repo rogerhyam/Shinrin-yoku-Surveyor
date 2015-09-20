@@ -129,6 +129,7 @@ shinrinyoku.onPhotoSuccess = function(imageData){
     
     // display it.
     $('#sy-photo img').attr('src',  imageData);
+	shinrinyoku.scaleThumbnail($('#sy-photo img'));
     $('#sy-photo-take').hide();
     $('#sy-photo').show('slow');
     
@@ -152,7 +153,6 @@ shinrinyoku.getBox = function(box_name){
 shinrinyoku.saveBox = function(box_name, box){
     window.localStorage.setItem(box_name, JSON.stringify(box));
 }
-
 
 shinrinyoku.saveSurveyor = function(){
     var surveyor = {};
@@ -459,7 +459,47 @@ shinrinyoku.stopBreathing = function(){
              shinrinyoku.stopGps();
              
          }
+}
 
+shinrinyoku.scaleThumbnail = function(img){
+ 	
+	 var img_height = img.prop('naturalHeight');
+	 var img_width = img.prop('naturalWidth');
+ 
+	 // put a hack in here incase the image hasn't loaded yet
+	 if(img_height == 0 || img_width == 0){
+		
+		console.log("retry thumbnail resize");
+	 	setTimeout(function(){
+			shinrinyoku.scaleThumbnail(img);
+	 	}, 500);
+		return;
+	 
+	 }
+	 
+	 if(img_height >= img_width){
+		 var scale = 80 / img_width;
+	 }else{
+	 	 var scale = 80 / img_height;
+	 }
+ 
+	 var img_width_scaled = img_width * scale;
+	 var img_height_scaled = img_height * scale;
+
+	 img.css('position', 'absolute');
+	 img.css('width', img_width_scaled);
+	 img.css('height', img_height_scaled);
+ 
+	 if(img_height >= img_width){
+	 	img.css('top',  ((img_height_scaled - 80) / 2) * -1  );
+		img.css('left', 0);
+	 }else{
+		 img.css('left', ((img_width_scaled - 80) / 2) * -1 );
+		 img.css('top', 0);
+	 }
+	 
+	 console.log("image h: " + img.height());
+	
  }
 
 /*
@@ -802,6 +842,18 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         var a1 = $('<a href="#"></a>');
         li.append(a1);
         a1.data('sy-survey-id', survey.id);
+		
+		 // if we have an image we should add it
+		 if(survey.photo){
+		 
+			 var idiv = $('<div class="thumbnail-wrapper"></div>');
+			 a1.append(idiv);
+			 var img = $('<img></img>');
+			 idiv.append(img);
+			 img.attr('src', survey.photo);
+			 shinrinyoku.scaleThumbnail(img);
+	 	 
+		 }
         
                 
         var h3 = $('<h3></h3>');
@@ -881,8 +933,6 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
 
          if(survey == null) continue;
        
-         console.log(survey);
-
          var li = $('<li></li>');
          li.attr('id', survey.id);
          li.attr('data-icon', 'action');
@@ -891,7 +941,18 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          li.append(a1);
          a1.data('sy-survey-id', survey.id);
 
-
+		 // if we have an image we should add it
+		 if(survey.photo){
+			 
+			 var idiv = $('<div class="thumbnail-wrapper"></div>');
+			 a1.append(idiv);
+			 var img = $('<img></img>');
+			 idiv.append(img);
+			 img.attr('src', survey.photo);
+			 shinrinyoku.scaleThumbnail(img);
+		 	 
+		 }
+		 
          var h3 = $('<h3></h3>');
          var d = new Date(survey.started);
          h3.html(d.toString(''));
@@ -912,7 +973,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          a1.on('click', function(){
              var url = $(this).data('survey-url');
              window.open(url, '_system');
-            console.log(url);
+             console.log(url);
          });
 
          $('div#history div.ui-content ul').append(li).trigger('create');

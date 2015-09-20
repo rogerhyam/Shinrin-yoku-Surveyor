@@ -2,12 +2,16 @@
 TODO
 ====
 
-* History and outbox need to display image thumbnail
-* Image thumbnail needed on ten breaths screen
-* Alerts when trying to submit without having filled in "about you"
+* Alerts when trying to submit without having filled in "about you" - maybe before ten breaths page is displayed?
 * Check help popup works on each screen 
 * about page initial text
 * standardise vocabulary on UI. Are we talking survey/measure/session/ten breaths what?
+
+Minor
+-----
+
+* display of thumbnails in list items has margin at bottom.
+
 
 Before App Store
 ================

@@ -154,6 +154,20 @@ html body .ui-group-theme-b .ui-bar-inherit {
     background-color: white; 
 }
 
+.thumbnail-wrapper{
+	float:left;
+	position: relative;
+	height: 80px;
+	width: 80px;
+	overflow: hidden;
+	margin-left: -16px;
+	margin-top: -11px;
+	margin-bottom: -12px;
+	margin-right: 1em;
+	padding: 0px;
+	
+}
+
 /*
 
 div.ui-page{
