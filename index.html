@@ -137,16 +137,14 @@
 
              </div>
 
-             <div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
-                 <h3>Breathing Slow</h3>
-                 <p>
-                    You have been conscious breathing for more than 90 seconds which is a bit slow.  
-                    Perhaps you lost count?
-                    Try again.
-                    Just do normal relaxed breathing.
-                </p>
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
-             </div>
+			<div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+				<h3>
+					Breathing Slow
+				</h3>
+				<p>
+					You have been conscious breathing for more than 90 seconds which is a bit slow. Perhaps you lost count? Try again. Just do normal relaxed breathing.
+				</p><a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+			</div>
 
              <div data-role="popup" id="survey-grounding-fast" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                  <h3>Breathing Fast</h3>
@@ -179,7 +177,7 @@
                       <p>Thanks for mapping another time and place of nourishment and healing.</p>
                       <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >OK</a>
                   </div>
-              </div>
+             </div>
 
              <div data-role="popup" id="survey-grounding-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                  <h3>Grounding Help</h3>
@@ -251,6 +249,17 @@
 
             </div><!-- end content -->
             
+            <div data-role="popup" id="surveyor-email-popup" data-overlay-theme="b" data-theme="a" data-dismissible="false">
+                <div data-role="header" data-theme="a">
+                	<h1>Missing Email</h1>
+                </div>
+                <div role="main" class="ui-content">
+                    <h3 class="ui-title">A valid email address is required</h3>
+                    <p>You need to set a valid email address on the 'About You' screen <span id="surveyor-email-message">before you start recording</span>.</p>
+                    <a href="#" data-rel="back" id="surveyor-email-popup-ok" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">OK</a>
+                </div>
+            </div>
+			
             <div data-role="popup" id="surveyor-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                 <h3>Surveyor Help</h3>
                 
@@ -297,10 +306,22 @@
                     </li>
                 </ul>
 
-             </div>
+             </div><!-- end content -->
 
              <div data-role="footer" data-position="fixed" >
                  <a href="#" id="submit-all" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Submit All</a>
+             </div>
+
+             <div data-role="popup" id="outbox-no-net" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
+                 <div data-role="header" data-theme="a">
+                 <h1>No Network</h1>
+                 </div>
+                 <div role="main" class="ui-content">
+                     <h3 class="ui-title">Can't connect to the server</h3>
+                     <p>Please check that you have an internet connection and try again.</p>
+					 <p>Error code: <span>unknown</span></p>
+                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow" data-rel="back">OK</a>
+                 </div>
              </div>
 
              <div data-role="popup" id="display-name-clash" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
@@ -311,7 +332,7 @@
                      <h3 class="ui-title">Sorry the name '<span></span>' is already in use.</h3>
                      <p>Please change your display name to submit your records.</p>
                      <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancel</a>
-                     <a href="#" id="display-name-clash-button" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">OK</a>
+                     <a href="#" id="display-name-clash-button" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b">OK</a>
                  </div>
              </div>
              

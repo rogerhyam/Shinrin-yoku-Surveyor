@@ -60,8 +60,6 @@ shinrinyoku.onGeoSuccess = function(position){
 
 shinrinyoku.onGeoError = function(error){
     
-    console.log(error);
-    
     // save the error to survey so we know what it is
     sysurvey.geolocation.error = error;
     
@@ -79,7 +77,6 @@ shinrinyoku.stopGps = function(){
 
 
 shinrinyoku.onMoveSuccess = function(acceleration){
-	// console.log('Acceleration Z: ' + acceleration.z + ' Timestamp: '      + acceleration.timestamp );
 	
 	var grounding = sysurvey.groundings[sysurvey.groundings.length - 1];
 	
@@ -97,7 +94,6 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 			
 			var breath_count = grounding.breaths.push({started: acceleration.timestamp, breathing_in: acceleration.z < 0 });
 			
-			console.log("Breath count: " + breath_count + ( acceleration.z > 0 ? ' Breathing OUT' : ' Breathing IN' ) );
 			if(breath_count > 20){
                 if(navigator.vibrate) navigator.vibrate([300]);
 				shinrinyoku.stopBreathing();
@@ -110,7 +106,6 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 }
 
 shinrinyoku.onMoveError = function(error){
-	console.log(error);
 	shinrinyoku.stopMove();
 }
 
@@ -259,7 +254,6 @@ shinrinyoku.submit = function(survey_ids, silent){
             success: function(data, textStatus, xhr){
 
                 $.mobile.loading( "hide" );
-                console.log("About to submit photo");
                 shinrinyoku.submitPhoto(survey, silent);
                 
                 // move from the out to history boxes
@@ -293,7 +287,8 @@ shinrinyoku.submit = function(survey_ids, silent){
                         $('#display-name-clash h3 span').html(surveyor.display_name);
                         $('#display-name-clash').popup('open');
                     }else{
-                        alert(xhr.statusText); // fixme: better error catching
+						$('#outbox-no-net span').html(xhr.status);
+						$('#outbox-no-net').popup('open');
                     }
                 } // not silent
             }
@@ -324,19 +319,17 @@ shinrinyoku.submitPhoto = function(survey, silent){
              function(r){
                  // success
                  $.mobile.loading( "hide" );
-                 console.log("Code = " + r.responseCode);
+                 /*
+				 console.log("Code = " + r.responseCode);
                  console.log("Response = " + r.response);
                  console.log("Sent = " + r.bytesSent);
+				 */
              },
              function(error){
                  $.mobile.loading( "hide" );
-                 alert("An error has occurred: Code = " + error.code);
-                 console.log("upload error source " + error.source);
-                 console.log("upload error target " + error.target);
+				 // fixme - not sure what we can do when the photo fails
              },
              options);
-    }else{
-        console.log('No photo to submit.')
     }
     
 }
@@ -444,8 +437,6 @@ shinrinyoku.stopBreathing = function(){
              // hopefully we have a position by now - if so we show it
              // if not we ask them to enter one
              
-             console.log(sysurvey);
-             
              if(sysurvey.geolocation.error){
                  $('#sy-geolocation-auto').hide();
                  $('#sy-geolocation-manual').show();
@@ -467,14 +458,13 @@ shinrinyoku.scaleThumbnail = function(img){
 	 var img_width = img.prop('naturalWidth');
  
 	 // put a hack in here incase the image hasn't loaded yet
-	 if(img_height == 0 || img_width == 0){
-		
-		console.log("retry thumbnail resize");
+	 // fixme - need a counter to prevent infinite loop if 
+	 // image not found
+	 if((img_height == 0 || img_width == 0) && !img.data('shinrinyoku-error')){
 	 	setTimeout(function(){
 			shinrinyoku.scaleThumbnail(img);
 	 	}, 500);
-		return;
-	 
+		return;	 
 	 }
 	 
 	 if(img_height >= img_width){
@@ -498,9 +488,69 @@ shinrinyoku.scaleThumbnail = function(img){
 		 img.css('top', 0);
 	 }
 	 
-	 console.log("image h: " + img.height());
+}
+
+shinrinyoku.getThumbnail = function(survey){
+  
+  // if we have an image we should return it or return null
+  if(survey.photo){
+ 	 var idiv = $('<div class="thumbnail-wrapper"></div>');
+	 var img = $('<img></img>');
+	 idiv.append(img);
+	 
+	 // we need to catch if we fail to load the image or the 
+	 // resize routine will loop infinitely
+	 img.on('error', function() {
+	 	 $(this).hide();
+		 $(this).data('shinrinyoku-error', true);
+	 });
+	 
+	 img.attr('src', survey.photo);
+	 shinrinyoku.scaleThumbnail(img);
+	 return idiv; 
+  }else{
+	  return null;
+  }
+ 
+}
+
+shinrinyoku.emailOk = function(message){
 	
- }
+    var surveyor = window.localStorage.getItem('surveyor');
+    if(!surveyor){
+        shinrinyoku.saveSurveyor();
+        surveyor = window.localStorage.getItem('surveyor');
+    }
+    surveyor = JSON.parse(surveyor);
+	
+	// check the email looks like an email
+	var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+	if(!re.test(surveyor.email)){
+		
+		// put a flag on the page to show the popup after it is loaded
+		$('#surveyor').data('shinrinyoku-email-popup', true);
+		
+		// we are passed the reason for needing the email
+		$('#surveyor-email-message').html(message); 
+		
+		// move to the surveyor page so they can fill in an email
+		$("body").pagecontainer("change", "#surveyor", {
+                  transition: 'fade',
+                  reverse: false,
+                  reloadPage: false
+        });
+		
+		return false;
+
+	}else{
+
+		return true;
+
+	}
+	
+}
+
+
 
 /*
  * The survey object class
@@ -544,7 +594,7 @@ var sysurvey = new ShinrinYokuSurvey();
 /*
  * W H O L E - D O C U M E N T 
  */
- $( function() {
+$( function() {
      
       $.mobile.changePage.defaults.allowSamePageTransition = true;
      
@@ -553,8 +603,6 @@ var sysurvey = new ShinrinYokuSurvey();
      
      // initialise the nav panel
      $( "#nav-panel" ).on( "panelbeforeopen", function( event, ui ) {
-         
-         console.log('panel opening');
          
          var outbox = shinrinyoku.getBox('outbox');
          $('#sy-outbox-count').html(outbox.length);
@@ -577,7 +625,7 @@ var sysurvey = new ShinrinYokuSurvey();
          $( "#strength-popup" ).popup('open');
      });
      
- });
+});
  
 
 /*
@@ -586,10 +634,8 @@ var sysurvey = new ShinrinYokuSurvey();
  
  // Triggered when the page has been created, but before enhancement is complete
  // good to add listeners
- $(document).on('pagecreate', '#ten-breaths', function(e, data) {
+$(document).on('pagecreate', '#ten-breaths', function(e, data) {
 
-     console.log("pagecreate #ten-breaths");
-    
      $('#ten-breaths-start').on('click', shinrinyoku.startBreathing);
      $('#ten-breaths-finished').on('click', shinrinyoku.stopBreathing);
      
@@ -691,8 +737,6 @@ var sysurvey = new ShinrinYokuSurvey();
          var outbox = shinrinyoku.getBox('outbox');
          outbox.push(sysurvey);
          shinrinyoku.saveBox('outbox', outbox);
-         
-         console.log(sysurvey);
 
          // attempt silent upload of latest survey
         setTimeout(function(){
@@ -702,7 +746,6 @@ var sysurvey = new ShinrinYokuSurvey();
             var outbox = shinrinyoku.getBox('outbox');
             if(outbox.length > 0){
                 var togo = outbox[outbox.length -1];
-                console.log(togo);
                 shinrinyoku.submit([togo.id], true);
             }
         
@@ -718,16 +761,19 @@ var sysurvey = new ShinrinYokuSurvey();
         
      });
      
- });
+});
 
  // Triggered on the "to" page, before transition animation starts
  // good to set state
- $(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
+$(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
      // reset the sysurvey
      shinrinyoku.resetSurvey();
 });
 
- 
+$(document).on('pageshow', '#ten-breaths', function(e, data) {
+	 shinrinyoku.emailOk('before you can tag locations');
+});
+
 /*
  * S U R V E Y O R - P A G E 
  */
@@ -757,11 +803,27 @@ var sysurvey = new ShinrinYokuSurvey();
                   reloadPage: false
         });
      });
+	 
+	 // when they close the email reminder box the email field gets focus
+	 $('#surveyor-email-popup').on( "popupafterclose", function( event, ui ) {
+		$('#email').focus();
+	 } );
+	 
  
  });
  // good to set state
  $(document).on('pagebeforeshow', '#surveyor', function(e, data) {
      shinrinyoku.populateSurveyor();
+ });
+
+ $(document).on('pageshow', '#surveyor', function(e, data) {
+	 
+	 // a flag may have been set to show the email popup
+	 if($('#surveyor').data('shinrinyoku-email-popup')){
+		 $('#surveyor').data('shinrinyoku-email-popup', false);
+	 	 $('#surveyor-email-popup').popup('open');
+	 }
+
  });
 
 /*
@@ -774,6 +836,8 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
     // submit all button
     $('#submit-all').on('click', function(){
         
+		if(!shinrinyoku.emailOk('before you submit locations')) return;
+		
         var outbox = shinrinyoku.getBox('outbox');
         var survey_ids = [];
         for(i = 0 ; i< outbox.length; i++){
@@ -808,13 +872,11 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
     // display name clash popup
     $('#display-name-clash-button').on('click', function(){
        
-       // close the popup
-       $('#display-name-clash').popup('close');
-       
        // send them to the surveyor page to change it
        $("body").pagecontainer("change", "#surveyor", {
            transition: 'slide',
            reverse: false,
+		   reloadPage: false
        });
        
        // focus the display name
@@ -834,27 +896,14 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
     for(i = 0 ; i< outbox.length; i++){
         
         var survey = outbox[i];
-        console.log(survey);
 
         var li = $('<li></li>');
         li.attr('id', survey.id);
 
         var a1 = $('<a href="#"></a>');
         li.append(a1);
-        a1.data('sy-survey-id', survey.id);
-		
-		 // if we have an image we should add it
-		 if(survey.photo){
-		 
-			 var idiv = $('<div class="thumbnail-wrapper"></div>');
-			 a1.append(idiv);
-			 var img = $('<img></img>');
-			 idiv.append(img);
-			 img.attr('src', survey.photo);
-			 shinrinyoku.scaleThumbnail(img);
-	 	 
-		 }
-        
+        a1.data('sy-survey-id', survey.id);		
+		a1.append(shinrinyoku.getThumbnail(survey));
                 
         var h3 = $('<h3></h3>');
         var d = new Date(survey.started);
@@ -889,7 +938,6 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         $('div#outbox div.ui-content ul').append(li).trigger('create');
     }
     $('div#outbox div.ui-content ul').listview().listview('refresh');
-    console.log($('div#outbox div.ui-content ul'));
     
     // we can only empty a history if we have one
     if(outbox.length > 0){
@@ -940,18 +988,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          var a1 = $('<a href="#"></a>');
          li.append(a1);
          a1.data('sy-survey-id', survey.id);
-
-		 // if we have an image we should add it
-		 if(survey.photo){
-			 
-			 var idiv = $('<div class="thumbnail-wrapper"></div>');
-			 a1.append(idiv);
-			 var img = $('<img></img>');
-			 idiv.append(img);
-			 img.attr('src', survey.photo);
-			 shinrinyoku.scaleThumbnail(img);
-		 	 
-		 }
+		 a1.append(shinrinyoku.getThumbnail(survey));
 		 
          var h3 = $('<h3></h3>');
          var d = new Date(survey.started);
@@ -973,13 +1010,11 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          a1.on('click', function(){
              var url = $(this).data('survey-url');
              window.open(url, '_system');
-             console.log(url);
          });
 
          $('div#history div.ui-content ul').append(li).trigger('create');
      }
      $('div#history div.ui-content ul').listview().listview('refresh');
-     //console.log($('div#history div.ui-content ul'));
      
      // we can only empty a history if we have one
      if(history.length > 0){
@@ -1021,8 +1056,6 @@ $(document).on('pagecreate', '#about', function(e, data) {
                 transition: 'flip',
        });
       
-      
-      console.log('You are in!!');
   });
 
 });
@@ -1041,15 +1074,12 @@ $(document).on('pagecreate', '#about', function(e, data) {
      
      // check the one we are using at the moment
      $('input[name=developer-submit-uri][value="' +  shinrinyoku.submit_uri + '"]').attr('checked', true).checkboxradio("refresh");
-     console.log($('input[name=developer-submit-uri][value="' +  shinrinyoku.submit_uri + '"]'));
      
  });
  // good to add listeners
  $(document).on('pagecreate', '#developer', function(e, data) {
  
     $('#developer-save-button').on('click', function(){
-
-        console.log($('input[name=developer-submit-uri]'));
         
         shinrinyoku.developer_mode = $('#developer-mode').prop('checked');
         shinrinyoku.submit_uri = $('input[name=developer-submit-uri]:checked').val();
