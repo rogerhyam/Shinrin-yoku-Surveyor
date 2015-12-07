@@ -1,140 +1,14 @@
-div.ui-footer a.footer-button{
-    float:right;
+#nav-panel li.home-menu-item a{
+	background-color: orange !important;
 }
 
-li.sy-strength-colour-0{
-/*    border: solid red 1px; */
+#nav-panel{
+	background-color: transparent;
 }
 
-
-li.ui-li-has-count.sy-strength-colour-2 a{
-     background-color: rgba(162, 255, 153, 0.5);
-}
-
-li.ui-li-has-count.sy-strength-colour-1 a{
-     background-color: rgba(235, 255, 153, 0.5);
-}
-
-li.ui-li-has-count.sy-strength-colour-0 a{
-     background-color: rgba(204, 204, 204, 0.5);
-}
-
-li.ui-li-has-count.sy-strength-colour--1 a{
-     background-color: rgba(255, 175, 153, 0.5);
-}
-
-li.ui-li-has-count.sy-strength-colour--2 a{
-     background-color: rgba(255, 122, 122, 0.5);
-}
-
-
-/*
-Override swatch a stuff 
-*/
-/* Bar: Toolbars, dividers, slider track */
-.ui-bar-a,
-.ui-page-theme-a .ui-bar-inherit,
-html .ui-bar-a .ui-bar-inherit,
-html .ui-body-a .ui-bar-inherit,
-html body .ui-group-theme-a .ui-bar-inherit {
-	background-color: rgba(77, 96, 81, 0.81); /*{a-bar-background-color}*/;
-	border-color:	 		#ddd /*{a-bar-border}*/;
-	color: 					#fff  /*{a-bar-color}*/;
-	text-shadow: 0 /*{a-bar-shadow-x}*/ 1px /*{a-bar-shadow-y}*/ 0 /*{a-bar-shadow-radius}*/ 	rgba(77, 96, 81, 1) /*{a-bar-shadow-color}*/;
-	font-weight: bold;
-}
-.ui-bar-a {
-	border-width: 1px;
-	border-style: solid;
-}
-
-/* Body: Read-only lists, text inputs, collapsible content */
-.ui-body-a,
-.ui-page-theme-a .ui-body-inherit,
-html .ui-bar-a .ui-body-inherit,
-html .ui-body-a .ui-body-inherit,
-html body .ui-group-theme-a .ui-body-inherit,
-html .ui-panel-page-container-a {
-	background-color: rgba(77, 96, 81, 0.2); /*{a-body-background-color}*/;
-	border-color:	 		#ddd /*{a-body-border}*/;
-	color: 					#333 /*{a-body-color}*/;
-	text-shadow: 0 /*{a-body-shadow-x}*/ 1px /*{a-body-shadow-y}*/ 0 /*{a-body-shadow-radius}*/ 	#f3f3f3 /*{a-body-shadow-color}*/;
-}
-/* Button up */
-.ui-page-theme-a .ui-btn,
-html .ui-bar-a .ui-btn,
-html .ui-body-a .ui-btn,
-html body .ui-group-theme-a .ui-btn,
-html head + body .ui-btn.ui-btn-a,
-/* Button hover */
-.ui-page-theme-a .ui-btn:hover,
-html .ui-bar-a .ui-btn:hover,
-html .ui-body-a .ui-btn:hover,
-html body .ui-group-theme-a .ui-btn:hover,
-html head + body .ui-btn.ui-btn-a:hover {
-	background-color:  rgba(77, 96, 81, 0.8); /* keep it the same as not clicked*/;
-	border-color:	 		#ddd /*{a-bhover-border}*/;
-	color: 					#fff /*{a-bhover-color}*/;
-	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ rgba(77, 96, 81, 1) /*{a-bhover-shadow-color}*/;
-}
-/* Button down */
-.ui-page-theme-a .ui-btn:active,
-html .ui-bar-a .ui-btn:active,
-html .ui-body-a .ui-btn:active,
-html body .ui-group-theme-a .ui-btn:active,
-html head + body .ui-btn.ui-btn-a:active {
-	background-color:  rgba(77, 96, 81, 0.2) /*{a-bdown-background-color}*/;
-	border-color:	 		#ddd /*{a-bdown-border}*/;
-	color: 					#333 /*{a-bdown-color}*/;
-	text-shadow: 0 /*{a-bdown-shadow-x}*/ 1px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #f3f3f3 /*{a-bdown-shadow-color}*/;
-}
-
-/*
-Override swatch b stuff 
-*/
-
-/* Button up */
-.ui-page-theme-b .ui-btn,
-html .ui-bar-b .ui-btn,
-html .ui-body-b .ui-btn,
-html body .ui-group-theme-b .ui-btn,
-html head + body .ui-btn.ui-btn-b,
-/* Button visited */
-.ui-page-theme-b .ui-btn:visited,
-html .ui-bar-b .ui-btn:visited,
-html .ui-body-b .ui-btn:visited,
-html body .ui-group-theme-b .ui-btn:visited,
-html head + body .ui-btn.ui-btn-b:visited {
-	background-color: rgba(77, 96, 81, 0.81); /*{b-bup-background-color}*/;
-	border-color: #1f1f1f; /*{b-bup-border}*/;
-	color:  #fff /*{b-bup-color}*/;
-	text-shadow: 0 /*{b-bup-shadow-x}*/ 0 /*{b-bup-shadow-y}*/ 0 /*{b-bup-shadow-radius}*/ black /*{b-bup-shadow-color}*/;
-}
-
-/* Body: Read-only lists, text inputs, collapsible content */
-.ui-body-b,
-.ui-page-theme-b .ui-body-inherit,
-html .ui-bar-b .ui-body-inherit,
-html .ui-body-b .ui-body-inherit,
-html body .ui-group-theme-b .ui-body-inherit,
-html .ui-panel-page-container-b {
-	background-color: rgba(0, 0, 0, 0.7); /*{b-body-background-color}*/;
-	border-color:	 		#1d1d1d /*{b-body-border}*/;
-	color: 					#fff /*{b-body-color}*/;
-	text-shadow: 0 /*{b-body-shadow-x}*/ 1px /*{b-body-shadow-y}*/ 0 /*{b-body-shadow-radius}*/ 	#111 /*{b-body-shadow-color}*/;
-}
-
-/* Bar: Toolbars, dividers, slider track */
-.ui-bar-b,
-.ui-page-theme-b .ui-bar-inherit,
-html .ui-bar-b .ui-bar-inherit,
-html .ui-body-b .ui-bar-inherit,
-html body .ui-group-theme-b .ui-bar-inherit {
-	background-color:   rgba(77, 96, 81, 0.8); /*{b-bar-background-color}*/;
-	border-color:	 		#1b1b1b /*{b-bar-border}*/;
-	color: 					#fff /*{b-bar-color}*/;
-	text-shadow: 0 /*{b-bar-shadow-x}*/ 1px /*{b-bar-shadow-y}*/ 0 /*{b-bar-shadow-radius}*/ 	#111 /*{b-bar-shadow-color}*/;
-	font-weight: bold;
+#nav-panel > div > ul > li.home-menu-item{
+	opacity: 1;
+	background-color: orange !important;
 }
 
 .ui-popup-screen{
@@ -144,14 +18,6 @@ html body .ui-group-theme-b .ui-bar-inherit {
 
 .ui-popup{
     background: white;
-}
-
-#geolocation-manual-text,
-#ten-breaths-text,
-#email,
-#display_name,
-#about_me {
-    background-color: white; 
 }
 
 .thumbnail-wrapper{
@@ -168,28 +34,15 @@ html body .ui-group-theme-b .ui-bar-inherit {
 	
 }
 
-/*
-
-div.ui-page{
-    color: white;
-    text-shadow: 0  1px 0  black;
-    background: linear-gradient(to bottom, #0d386d 0%,#70933e 85%); 
+#ten-breaths-start{
+	width: 80% !important;
+	height: 122px !important;
+	border-radius: 20px !important;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: orange;
+	box-shadow: 3px 3px 10px #333333;
+	font-size: 20px;
+	line-height: 90px;
 }
 
-div.ui-content.ui-popup{
-    color: white;
-    text-shadow: 0  1px 0  black;
-    background-color: #0D386D;
-    border: solid white 1px;
-    box-shadow: 1px 1px 3px black;
-}
-
-div.ui-popup-screen{
-    background-color: black;
-}
-
-div.ui-page div.ui-content ul{
-
-}
-
-*/

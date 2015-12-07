@@ -7,10 +7,12 @@ shinrinyoku.developer_mode = false;
 
 // two different sites we could submit to
 shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
-shinrinyoku.submit_uri_dev = 'https://ten-breaths-server-rogerhyam.c9.io/submit/index.php';
+shinrinyoku.submit_uri_dev = 'https://shinrin-yoku-server-rogerhyam-1.c9.io/submit/index.php';
 
 // default to the live site
-shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
+// shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
+shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev;
+
 
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
@@ -94,9 +96,13 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 			
 			var breath_count = grounding.breaths.push({started: acceleration.timestamp, breathing_in: acceleration.z < 0 });
 			
+			// quit on count of 20 turns quit
+			// give a blip of vibration as haptic feedback
 			if(breath_count > 20){
                 if(navigator.vibrate) navigator.vibrate([300]);
 				shinrinyoku.stopBreathing();
+			}else{
+				if(navigator.vibrate) navigator.vibrate([1]);
 			}
 		
 		}
@@ -149,32 +155,6 @@ shinrinyoku.saveBox = function(box_name, box){
     window.localStorage.setItem(box_name, JSON.stringify(box));
 }
 
-shinrinyoku.saveSurveyor = function(){
-    var surveyor = {};
-    $('input.surveyor_field,select.surveyor_field,textarea.surveyor_field').each(function(index){        
-        surveyor[$(this).attr('id')] = $(this).val();
-    });
-    window.localStorage.setItem('surveyor', JSON.stringify(surveyor));
-}
-
-shinrinyoku.populateSurveyor = function(){
-    
-    var surveyor = window.localStorage.getItem('surveyor');
-    if(!surveyor){
-        shinrinyoku.saveSurveyor();
-        surveyor = window.localStorage.getItem('surveyor');
-    }
-    surveyor = JSON.parse(surveyor);
-    
-    $('input.surveyor_field,select.surveyor_field,textarea.surveyor_field').each(function(index){
-        $(this).val(surveyor[$(this).attr('id')]);
-        if($(this).is('select')){
-            $(this).selectmenu("refresh", true);
-        }
-    });
-        
-}
-
 shinrinyoku.resetSurvey = function(){
     
      // we must have a sysurvey object to use
@@ -187,32 +167,14 @@ shinrinyoku.resetSurvey = function(){
         shinrinyoku.min_breaths_duration = shinrinyoku.min_breaths_duration_default;
         shinrinyoku.max_breaths_duration = shinrinyoku.max_breaths_duration_default;
     }
-    
-    // set the buttons ready for a new breathing exercise
-    $('#ten-breaths-start').text('Start');
-    $('#ten-breaths-start').removeClass('ui-disabled');
-    $('#ten-breaths-finished').addClass('ui-disabled');
-    $('#ten-breaths-text').addClass('ui-disabled');
-    $('#ten-breaths-photo').addClass('ui-disabled');
-    $('#ten-breaths-save').addClass('ui-disabled');
-    
-    // hide the geo fields till we stop
-    $('#sy-geolocation-auto').hide();
-    $('#sy-geolocation-auto p').html('');
-    $('#sy-geolocation-manual').hide();
-    $('#sy-geolocation-manual textarea').val('');
-    
-    // no text at start
-    $('#ten-breaths-text').val('');
-    
-    // no photo at start
-    $('#sy-photo').hide();
-    $('#sy-photo img').attr('src', '');
-    $('#sy-photo-take').show();
+   
+    shinrinyoku.setDisplayReady();
 
 }
 
 shinrinyoku.submit = function(survey_ids, silent){
+	
+	// FIXME - THIS SHOULD ONLY HAPPEN IF THEY ARE LOGGED IN
     
     if (typeof(silent)==='undefined') silent = false;
     
@@ -233,11 +195,7 @@ shinrinyoku.submit = function(survey_ids, silent){
         
         // get a string representation.
         var survey_string = JSON.stringify(survey);
-        
-        // the surveyor object
-        var surveyor_string = window.localStorage.getItem('surveyor');
-        var surveyor = JSON.parse(surveyor_string);
-        
+
         // post it to the server
         if(!silent){
             $.mobile.loading( "show", { text: 'Uploading data ...', textVisible: true});
@@ -248,8 +206,8 @@ shinrinyoku.submit = function(survey_ids, silent){
             type: 'POST',
             data: {
                 'survey': survey_string,
-                'surveyor': surveyor_string,
-                'api_key': window.localStorage.getItem('api_key')
+                'user_key': window.localStorage.getItem('user_key'),
+                'device_key': window.localStorage.getItem('device_key')
             },
             success: function(data, textStatus, xhr){
 
@@ -283,6 +241,8 @@ shinrinyoku.submit = function(survey_ids, silent){
             error: function(xhr, textStatus){
                 if(!silent){
                     $.mobile.loading( "hide" );
+					
+					// FIXME - THIS IS IRRELIVANT WITHOUT SURVEYOR 
                     if(xhr.status == 409){
                         $('#display-name-clash h3 span').html(surveyor.display_name);
                         $('#display-name-clash').popup('open');
@@ -336,14 +296,16 @@ shinrinyoku.submitPhoto = function(survey, silent){
 
 shinrinyoku.startBreathing = function(){
          
+		// haptic feedback on this button
+    	if(navigator.vibrate) navigator.vibrate([1]);
+		 
          var d = new Date();
          
          // if we are already running then cancel and return
          if(shinrinyoku.grounding_timer){
              sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
-             $('#ten-breaths-start').blur();
+             //$('#ten-breaths-finished').addClass('ui-disabled');
+			 shinrinyoku.setDisplayReady();
              clearTimeout(shinrinyoku.grounding_timer);
              shinrinyoku.grounding_timer = false;
 			 shinrinyoku.stopMove();
@@ -353,20 +315,21 @@ shinrinyoku.startBreathing = function(){
          // Start them off
          if(sysurvey.groundings.length == 0) sysurvey.startRecording();
          sysurvey.groundings[sysurvey.groundings.length] = { 'started': d.getTime() };
+		 
          
-         $('#ten-breaths-finished').removeClass('ui-disabled');
-         $('#ten-breaths-start').text('Cancel');
-         $('#ten-breaths-start').blur();
-         
+         //$('#ten-breaths-finished').removeClass('ui-disabled');
+		 shinrinyoku.setDisplayBreathing();
+
          // start the timer to cancel if they fall asleep
          shinrinyoku.grounding_timer = setTimeout(function(){
                 
                 $('#survey-grounding-slow').popup('open');
                 
-                $('#ten-breaths-finished').addClass('ui-disabled');
-                $('#ten-breaths-start').text('Start');
-                shinrinyoku.ten_breaths_running = false;               
-
+                //$('#ten-breaths-finished').addClass('ui-disabled');
+                //$('#ten-breaths-start').text("Start");
+                shinrinyoku.ten_breaths_running = false;
+				shinrinyoku.setDisplayReady();
+				
                 if(navigator.vibrate){
                     navigator.vibrate([300,500,300]);
                 }
@@ -420,35 +383,17 @@ shinrinyoku.stopBreathing = function(){
          if (duration < shinrinyoku.min_breaths_duration){
              session.toofast = true;   
              $('#survey-grounding-fast').popup('open');   
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
+             // $('#ten-breaths-finished').addClass('ui-disabled');
+             // $('#ten-breaths-start').text("Start");
+			 shinrinyoku.setDisplayReady();
+         }else if(sysurvey.geolocation.error){
+			 // FIXME - nice error if we can't get a possition
+			 alert("No location!");
+			 shinrinyoku.setDisplayReady();
          }else{
-             
-             sysurvey.ten_breaths_completed = true;
-             
-             // they are ready to save..
-             $('#ten-breaths-text').removeClass('ui-disabled');
-             $('#ten-breaths-photo').removeClass('ui-disabled');
-             $('#ten-breaths-save').removeClass('ui-disabled');
-             $('#ten-breaths-start').text('Start');
-             $('#ten-breaths-start').addClass('ui-disabled');
-             $('#ten-breaths-finished').addClass('ui-disabled');
-             
-             // hopefully we have a position by now - if so we show it
-             // if not we ask them to enter one
-             
-             if(sysurvey.geolocation.error){
-                 $('#sy-geolocation-auto').hide();
-                 $('#sy-geolocation-manual').show();
-                 $('#sy-geolocation-manual textarea').focus();
-             }else{
-                 $('#sy-geolocation-manual').hide();
-                 $('#sy-geolocation-auto').show();
-                 //$('#ten-breaths-text').focus();
-             }
-             
+			 sysurvey.ten_breaths_completed = true;
              shinrinyoku.stopGps();
-             
+			 shinrinyoku.setDisplayCompleted();
          }
 }
 
@@ -514,42 +459,65 @@ shinrinyoku.getThumbnail = function(survey){
  
 }
 
-shinrinyoku.emailOk = function(message){
+shinrinyoku.setDisplayReady = function(){
+		
+    // set the buttons ready for a new breathing exercise
+    $('#ten-breaths-start').text("Take Ten");
+    $('#ten-breaths-start').removeClass('ui-disabled');
+
+	// turn off user inputs
+    $('#ten-breaths-text').addClass('ui-disabled');    
+	$('#sy-button-grid button').addClass('ui-disabled');
+	$('#ten-breaths-login2save').addClass('ui-disabled');
+  
+    // hide the geo fields till we stop
+    $('#sy-geolocation-auto').hide();
+    $('#sy-geolocation-auto p').html('');
 	
-    var surveyor = window.localStorage.getItem('surveyor');
-    if(!surveyor){
-        shinrinyoku.saveSurveyor();
-        surveyor = window.localStorage.getItem('surveyor');
-    }
-    surveyor = JSON.parse(surveyor);
-	
-	// check the email looks like an email
-	var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-	if(!re.test(surveyor.email)){
-		
-		// put a flag on the page to show the popup after it is loaded
-		$('#surveyor').data('shinrinyoku-email-popup', true);
-		
-		// we are passed the reason for needing the email
-		$('#surveyor-email-message').html(message); 
-		
-		// move to the surveyor page so they can fill in an email
-		$("body").pagecontainer("change", "#surveyor", {
-                  transition: 'fade',
-                  reverse: false,
-                  reloadPage: false
-        });
-		
-		return false;
-
-	}else{
-
-		return true;
-
-	}
+    // no text at start
+    $('#ten-breaths-text').val('');
+    
+    // no photo at start
+    $('#sy-photo').hide();
+    $('#sy-photo img').attr('src', '');
+    $('#sy-photo-take').show();
 	
 }
 
+shinrinyoku.setDisplayBreathing = function(){	
+    $('#ten-breaths-start').text('Cancel');
+    $('#ten-breaths-start').blur();
+}
+
+shinrinyoku.setDisplayCompleted = function(){
+    $('#sy-geolocation-auto').show();
+    $('#ten-breaths-text').removeClass('ui-disabled');  
+	$('#sy-button-grid button').removeClass('ui-disabled');
+	$('#ten-breaths-login2save').addClass('ui-disabled');
+    $('#ten-breaths-start').text("Take Ten");
+    $('#ten-breaths-start').addClass('ui-disabled');
+}
+
+shinrinyoku.setDisplayLogin = function(){
+	
+	// different things depending on whether they are logged in or not.
+	var userKey = window.localStorage.getItem('user_key');
+	
+	if(userKey){
+		$('.sy-user-logged-in').show();
+		$('.sy-user-logged-out').hide();
+		var displayName = window.localStorage.getItem('user_display_name');
+		$('.sy-user-display-name').html(displayName);
+		
+	}else{
+		$('.sy-user-logged-in').hide();
+		$('.sy-user-logged-out').show();
+	}
+
+	// clear the login and sign up forms
+    $('.authentication-input').val('');
+	
+}
 
 
 /*
@@ -614,9 +582,9 @@ $( function() {
      
      
      // we have a unique key for this install
-    var api_key = window.localStorage.getItem('api_key');
-    if(!api_key){
-        window.localStorage.setItem('api_key', shinrinyoku.getRandomId());
+    var device_key = window.localStorage.getItem('device_key');
+    if(!device_key){
+        window.localStorage.setItem('device_key', shinrinyoku.getRandomId());
     }
 
      // listen for popup calls across multiple pages
@@ -624,6 +592,19 @@ $( function() {
          $( "#strength-popup" ).data('sy-metric-anchor', $(this));
          $( "#strength-popup" ).popup('open');
      });
+	 
+	 // update for if we are logged in or not
+	 shinrinyoku.setDisplayLogin();
+	 
+	 // listen for logging out
+	 $('#sy-user-logout').on('click', function(){
+		 
+		 localStorage.removeItem('user_key');
+		 localStorage.removeItem('user_display_name');
+		 shinrinyoku.setDisplayLogin();
+         $("body").pagecontainer("change", "#ten-breaths");
+		 
+	 });
      
 });
  
@@ -637,7 +618,7 @@ $( function() {
 $(document).on('pagecreate', '#ten-breaths', function(e, data) {
 
      $('#ten-breaths-start').on('click', shinrinyoku.startBreathing);
-     $('#ten-breaths-finished').on('click', shinrinyoku.stopBreathing);
+     // $('#ten-breaths-finished').on('click', shinrinyoku.stopBreathing);
      
      // listen to the menu button to validate etc
      $('#ten-breaths-back').on('click', function(){
@@ -731,8 +712,7 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          
          // values on the form 
          sysurvey.textComments = $('#ten-breaths-text').val();
-         sysurvey.geolocation.manual = $('#geolocation-manual-text').val();
-
+         
          // add it to the outbox
          var outbox = shinrinyoku.getBox('outbox');
          outbox.push(sysurvey);
@@ -771,60 +751,173 @@ $(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
 });
 
 $(document).on('pageshow', '#ten-breaths', function(e, data) {
-	 shinrinyoku.emailOk('before you can tag locations');
+	 
 });
 
 /*
- * S U R V E Y O R - P A G E 
+ * L O G I N - P A G E 
+ *
  */
- // good to add listeners
- $(document).on('pagecreate', '#surveyor', function(e, data) {
+$(document).on('pagecreate', '#login', function(e, data) {
+	
+	// default is to show only login components
+	$('.sy-login-component').show();
+	$('.sy-signup-component').hide();
+	$('.sy-forgot-component').hide();
+	
+	// select login
+	$('#sy-navbar-login').on('click', function(){
+		$('.sy-login-component').show();
+		$('.sy-signup-component').hide();
+		$('.sy-forgot-component').hide();
+	});
+	
+	// select signup
+	$('#sy-navbar-signup').on('click', function(){
+		$('.sy-login-component').hide();
+		$('.sy-signup-component').show();
+		$('.sy-forgot-component').hide();
+	});
 
-     // listen for keyup on any field
-     $('.surveyor_field').keyup(function(){
-         shinrinyoku.saveSurveyor();
-     });
-     
-     // listen for the clear button on any text field
-     $('input.surveyor_field').parent().find('.ui-input-clear').on('click', function () {
-        shinrinyoku.saveSurveyor();
-     });
+	// select forgot password
+	$('#sy-navbar-forgot').on('click', function(){
+		$('.sy-login-component').hide();
+		$('.sy-signup-component').hide();
+		$('.sy-forgot-component').show();
+	});
+	
+	// when the popup is closed we go home if authentication
+	// process has lead to them being logged in.
+	$( "#login-popup" ).on( "popupafterclose", function( event, ui ) {
+		$("body").pagecontainer("change", "#ten-breaths");
+	});
+	
+	// submit signup
+	$('#signup-button').on('click', function(){
+		console.log('Sign you up');
+		console.log($('#signup-password').val());
+		
+		$.mobile.loading( "show" );
+		// call server and look for response
+        $.ajax({
+            url: shinrinyoku.submit_uri,
+            type: 'POST',
+            data: {
+				'authentication': 'signup',
+                'display_name': $('#signup-display-name').val(),
+				'email': $('#signup-email').val(),
+                'password': $('#signup-password').val()
+            },
+            success: function(data, textStatus, xhr){
 
-     // listen for changing select lists
-     $('select.surveyor_field').on('change', function () {
-        shinrinyoku.saveSurveyor();
-     });
-     
-     // finished button
-     $('#surveyor-finished-button').on('click', function(){
-         $("body").pagecontainer("change", "#home", {
-                  transition: 'slide',
-                  reverse: true,
-                  reloadPage: false
+                $.mobile.loading( "hide" );
+				console.log(data);
+				if(data.success){
+					
+					// they will have been given a user key
+					window.localStorage.setItem('user_key', data.userKey);
+					window.localStorage.setItem('user_display_name', data.displayName);
+					
+					shinrinyoku.setDisplayLogin();
+					
+					// this time when they close the popup they are taken to the home page
+					$('#login-popup-title').html("Sign Up Successful");
+					$('#login-popup-message').html("<p>You are now logged in.</p><p>You have been sent an email to confirm your address.</p>");
+					
+				}else{
+					
+					// multiple errors or one
+					if(data.errors.length > 1){
+						$('#login-popup-title').html("Sign Up Problems");
+						var errorOL = $("<ol></ol>");
+						for(var i = 0; i < data.errors.length; i++){
+							var errorLI = $("<li>" + data.errors[i] + "</li>");
+							errorOL.append(errorLI);
+						}
+						$('#login-popup-message').empty();
+						$('#login-popup-message').append(errorOL);
+					}else{
+						$('#login-popup-title').html("Sign Up Problem");
+						var errorP = $("<p>" + data.errors[0] + "</p>");
+						$('#login-popup-message').empty();
+						$('#login-popup-message').append(errorP);
+					}
+				
+				}
+				
+				// tell them about it
+				$('#login-popup').popup('open');
+                
+            },
+            error: function(xhr, textStatus){
+                    $.mobile.loading( "hide" );
+                    console.log(xhr);
+					console.log(textStatus);
+					$('#login-popup-title').html("Sign Up Error");
+					$('#login-popup-message').html("There was a problem connecting to the server. Please try again later.");
+					$('#login-popup').popup('open');
+					
+             }
         });
-     });
-	 
-	 // when they close the email reminder box the email field gets focus
-	 $('#surveyor-email-popup').on( "popupafterclose", function( event, ui ) {
-		$('#email').focus();
-	 } );
-	 
- 
- });
- // good to set state
- $(document).on('pagebeforeshow', '#surveyor', function(e, data) {
-     shinrinyoku.populateSurveyor();
- });
+		
+	});
+	
+	// submit login
+	$('#login-button').on('click', function(){
+		console.log('log you in');
+		
+		$.mobile.loading( "show" );
+		// call server and look for response
+        $.ajax({
+            url: shinrinyoku.submit_uri,
+            type: 'POST',
+            data: {
+				'authentication': 'login',
+				'email': $('#login-email').val(),
+                'password': $('#login-password').val()
+            },
+            success: function(data, textStatus, xhr){
 
- $(document).on('pageshow', '#surveyor', function(e, data) {
-	 
-	 // a flag may have been set to show the email popup
-	 if($('#surveyor').data('shinrinyoku-email-popup')){
-		 $('#surveyor').data('shinrinyoku-email-popup', false);
-	 	 $('#surveyor-email-popup').popup('open');
-	 }
-
- });
+                $.mobile.loading( "hide" );
+				console.log(data);
+				if(data.success){
+					
+					// they will have been given a user key
+					window.localStorage.setItem('user_key', data.userKey);
+					window.localStorage.setItem('user_display_name', data.displayName);
+		
+					shinrinyoku.setDisplayLogin();
+					$("body").pagecontainer("change", "#ten-breaths");					
+										
+				}else{
+					$('#login-popup-title').html("Log In Failed");
+					$('#login-popup-message').html("<p>Sorry. The email or password were incorrect.</p>");
+				}
+				
+				// tell them about it
+				$('#login-popup').popup('open');
+                
+            },
+            error: function(xhr, textStatus){
+                    $.mobile.loading( "hide" );
+                    console.log(xhr);
+					console.log(textStatus);
+					$('#login-popup-title').html("Login Error");
+					$('#login-popup-message').html("There was a problem connecting to the server. Please try again later.");
+					$('#login-popup').popup('open');
+					
+             }
+        });
+		
+	});
+	
+	// submit forgot
+	$('#forgot-button').on('click', function(){
+		console.log('remind you up');
+		// FIXME: incomplete
+	});
+	
+});
 
 /*
  * O U T B O X - P A G E
@@ -835,9 +928,7 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
     
     // submit all button
     $('#submit-all').on('click', function(){
-        
-		if(!shinrinyoku.emailOk('before you submit locations')) return;
-		
+        	
         var outbox = shinrinyoku.getBox('outbox');
         var survey_ids = [];
         for(i = 0 ; i< outbox.length; i++){
@@ -866,21 +957,6 @@ $(document).on('pagecreate', '#outbox', function(e, data) {
         
         // remove the list item
         $('#'+ survey_id).hide();
-        
-    });
-    
-    // display name clash popup
-    $('#display-name-clash-button').on('click', function(){
-       
-       // send them to the surveyor page to change it
-       $("body").pagecontainer("change", "#surveyor", {
-           transition: 'slide',
-           reverse: false,
-		   reloadPage: false
-       });
-       
-       // focus the display name
-       $('#display_name').focus();
         
     });
     
@@ -913,8 +989,6 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         var p = $('<p></p>');
         if(survey.geolocation.display_string){
             p.html(survey.geolocation.display_string);
-        }else if(survey.geolocation.manual){
-            p.html('<strong>Location:</strong> ' + survey.geolocation.manual);
         }
         a1.append(p);
         
@@ -998,8 +1072,6 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          var p = $('<p></p>');
          if(survey.geolocation.display_string){
           p.html(survey.geolocation.display_string);
-         }else if(survey.geolocation.manual){
-          p.html('<strong>Location:</strong> ' + survey.geolocation.manual);
          }
          a1.append(p);
          
