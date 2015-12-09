@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="uk.org.rbge.hyam.shinrinyoku.surveyor" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Ten Breaths Mapper</name>
+    <description>
+        Places that nourish. Places that heal.
+    </description>
+    <author email="r.hyam@rbge.org.uk" href="http://www.rbge.org.uk">
+        Roger Hyam
+    </author>
+    <content src="index.html" />
+    
+    <preference name="orientation" value="portrait" />
+    <preference name="fullscreen" value="false" /> <!- set true for ios and false for android -->
+    
+    <!-- Status bar plugin parameters -->
+    <preference name="StatusBarOverlaysWebview" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#000000" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    
+    <plugin name="cordova-plugin-whitelist" version="1" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+</widget>
