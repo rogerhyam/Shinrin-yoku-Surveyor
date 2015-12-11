@@ -3,7 +3,7 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
-shinrinyoku.developer_mode = false;
+shinrinyoku.developer_mode = true;
 
 // two different sites we could submit to
 shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
@@ -17,7 +17,7 @@ shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev;
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
 shinrinyoku.max_breaths_duration_default = 90;
-shinrinyoku.min_breaths_duration_developer = 2;
+shinrinyoku.min_breaths_duration_developer = 1;
 shinrinyoku.max_breaths_duration_developer = 10;
 
 shinrinyoku.getRandomId = function(){
@@ -32,7 +32,7 @@ shinrinyoku.onGeoSuccess = function(position){
     // if survey is null they have given up
     if(!sysurvey) return;
     
-    // update the interface with the location
+	// make a human friendly string
     if(position.coords.latitude > 0){
         var lat = position.coords.latitude.toFixed(4) + '&deg; N';
     }else{
@@ -45,7 +45,7 @@ shinrinyoku.onGeoSuccess = function(position){
         var lon = Math.abs(position.coords.longitude).toFixed(4) + '&deg; W';
     }
 
-    sysurvey.geolocation.display_string = '<strong>Position:</strong> ' + lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy + 'm)';
+    sysurvey.geolocation.display_string = '<strong>Position:</strong> ' + lat + ' ' + lon + ' (&plusmn; ' + position.coords.accuracy.toFixed(2) + 'm)';
 
     $('#sy-geolocation-auto p').html(sysurvey.geolocation.display_string);
     
@@ -303,13 +303,23 @@ shinrinyoku.startBreathing = function(){
          
          // if we are already running then cancel and return
          if(shinrinyoku.grounding_timer){
-             sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
-             //$('#ten-breaths-finished').addClass('ui-disabled');
-			 shinrinyoku.setDisplayReady();
-             clearTimeout(shinrinyoku.grounding_timer);
-             shinrinyoku.grounding_timer = false;
-			 shinrinyoku.stopMove();
-             return;
+			 
+			 // if we are in dev mode then we just pretend we are done
+			 // this allows testing in a browser
+			 if(shinrinyoku.developer_mode){
+				 shinrinyoku.stopBreathing();
+				 return;
+			 }else{
+	             sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
+	             //$('#ten-breaths-finished').addClass('ui-disabled');
+				 shinrinyoku.setDisplayReady();
+	             clearTimeout(shinrinyoku.grounding_timer);
+	             shinrinyoku.grounding_timer = false;
+				 shinrinyoku.stopMove();
+	             return;
+			 }
+			 
+
          }
          
          // Start them off
@@ -566,9 +576,9 @@ $( function() {
      
       $.mobile.changePage.defaults.allowSamePageTransition = true;
      
-     // initialise the right panel
+     // initialise the nav panel
      $("#nav-panel").panel().enhanceWithin();
-     
+	
      // initialise the nav panel
      $( "#nav-panel" ).on( "panelbeforeopen", function( event, ui ) {
          
@@ -580,6 +590,23 @@ $( function() {
          
      } );
      
+	 // initialise the logout popup
+	 $('#ten-breaths-logout-popup').enhanceWithin().popup();
+     
+	 // listen for logging out (either on panel or page)
+	 $('.sy-user-logout').on('click', function(){
+		 console.log('log out requested');
+		 $('#ten-breaths-logout-popup').popup('open');
+	 });
+	 
+	 // listen for the logout button on the logout popup
+	 $('#ten-breaths-logout-popup-confirm').on('click', function(){
+		 localStorage.removeItem('user_key');
+		 localStorage.removeItem('user_display_name');
+		 shinrinyoku.setDisplayLogin();
+         $("body").pagecontainer("change", "#ten-breaths");
+	 });
+	 
      
      // we have a unique key for this install
     var device_key = window.localStorage.getItem('device_key');
@@ -596,16 +623,7 @@ $( function() {
 	 // update for if we are logged in or not
 	 shinrinyoku.setDisplayLogin();
 	 
-	 // listen for logging out
-	 $('#sy-user-logout').on('click', function(){
-		 
-		 localStorage.removeItem('user_key');
-		 localStorage.removeItem('user_display_name');
-		 shinrinyoku.setDisplayLogin();
-         $("body").pagecontainer("change", "#ten-breaths");
-		 
-	 });
-     
+	 
 });
  
 
@@ -650,6 +668,10 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          shinrinyoku.stopGps();
 
      });
+	 
+	 $('#ten-breaths-clear').on('click', function(){
+		 alert('clear me');
+	 });
      
      $('#sy-photo-take button').on('click', function(){
          
@@ -675,7 +697,7 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
              }
              );
          
-     })
+     });
      
      $('#sy-photo').on('click', function(){
          
@@ -887,15 +909,16 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					window.localStorage.setItem('user_display_name', data.displayName);
 		
 					shinrinyoku.setDisplayLogin();
+					
 					$("body").pagecontainer("change", "#ten-breaths");					
 										
 				}else{
 					$('#login-popup-title').html("Log In Failed");
 					$('#login-popup-message').html("<p>Sorry. The email or password were incorrect.</p>");
+					$('#login-popup').popup('open');
 				}
 				
-				// tell them about it
-				$('#login-popup').popup('open');
+				
                 
             },
             error: function(xhr, textStatus){
@@ -905,7 +928,6 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					$('#login-popup-title').html("Login Error");
 					$('#login-popup-message').html("There was a problem connecting to the server. Please try again later.");
 					$('#login-popup').popup('open');
-					
              }
         });
 		

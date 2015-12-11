@@ -88,15 +88,29 @@
                        </a>
                     </li>
 					
-					<li data-icon="minus" class="sy-user-logged-in" >
-                       <a href="#"  data-transition="slide" id="sy-user-logout">
-						   <h2 class="sy-user-display-name">	</h2>
+					<li data-icon="user" class="sy-user-logged-in" >
+                       <a href="#"  data-transition="slide" class="sy-user-logout">
+						   <h2 class="sy-user-display-name"></h2>
                        </a>
                     </li>					
 
                 </ul>
                 
     	</div><!-- /left panel -->
+		
+		<!-- Logout Popup used on several pages -->
+        <div data-role="popup" id="ten-breaths-logout-popup" data-overlay-theme="b" data-theme="a" data-dismissible="false" style="max-width:400px;">
+            <div data-role="header" data-theme="a">
+            <h1>Log Out?</h1>
+            </div>
+            <div role="main" class="ui-content">
+                <h3 class="ui-title">Log Out</h3>
+                <p>Are you sure you want to log out?</p>
+                <a href="#" data-rel="back" id="ten-breaths-logout-popup-cancel" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >Cancel</a>
+                <a href="#" id="ten-breaths-logout-popup-confirm" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">Log Out</a>
+            </div>
+        </div>
+
 
          <!-- T E N  - B R E A T H S -->
         <div data-role="page" id="ten-breaths" data-theme="a">
@@ -128,21 +142,11 @@
 							href="#"
 						 >Take Ten</button>
                     </li>
-					
-                    <li id="sy-geolocation-auto" class="ui-field-contain" >
-                         <p></p>
-                    </li>
 
                     <li class="ui-field-contain" >
                          <textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
                     </li>
 
-                    <li id="sy-photo" data-icon="delete" ><a href="#">
-                            <div class="thumbnail-wrapper"><img src=""></div>
-                            <h2>Delete</h2>
-                            <p>Remove the photo (can't be undone)</p>
-                        </a>
-                    </li>
                     <li id="sy-button-grid">
 						<div class="ui-grid-a">
 						    <div class="ui-block-a">
@@ -152,7 +156,11 @@
 								 <button id="ten-breaths-photo" class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-top" >Add Photo</button>
 							</div>
 						    <div class="ui-block-a">
-								<button id="ten-breaths-clear" class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-top" >Clear</button>
+								<button
+									id="ten-breaths-clear"
+									class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-top"
+									
+									>Clear</button>
 							</div>
 						    <div class="ui-block-b">
 								<button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-top" >Save</button>
@@ -160,6 +168,30 @@
 							</div>
 						</div>
                     </li>
+                    <li id="sy-photo" data-icon="delete" ><a href="#">
+                            <div class="thumbnail-wrapper"><img src=""></div>
+                            <h2>Delete</h2>
+                            <p>Remove the photo (can't be undone)</p>
+                        </a>
+                    </li>
+				</ul>
+				
+				<ul data-role="listview" data-inset="true">
+					
+					<!-- display the username if logged in -->
+                    <li data-icon="user" class="sy-user-logged-in sy-user-logout">
+						<a href="#">
+                            <h2 class="sy-user-display-name"></h2>
+						</a>
+                    </li>
+					
+					<!-- display the login prompt if not logged in -->
+                    <li id="sy-photo" data-icon="user" class="sy-user-logged-out">
+						<a href="#login" >
+                            <h2>Login / Sign Up</h2>
+						</a>
+                    </li>
+					
                  </ul>
 
 
@@ -246,7 +278,7 @@
             <div role="main" class="ui-content">
 				
 				<div class="sy-login-component" >
-					<ul data-role="listview" data-inset="false" data-theme="a"  >
+					<ul data-role="listview" data-inset="true" data-theme="a"  >
 	                    <li class="ui-field-contain">
 	                        <label for="login-email">Email:</label>
 	                        <input name="login-email" id="login-email" class="authentication-input" value="" data-clear-btn="false" type="text">
@@ -262,7 +294,7 @@
 				</div>
 				
 				<div class="sy-forgot-component" >
-					<ul data-role="listview" data-inset="false" data-theme="a" >
+					<ul data-role="listview" data-inset="true" data-theme="a" >
 	                    <li class="ui-field-contain">
 	                        <label for="forgot-email">Email:</label>
 	                        <input name="forgot-email" id="forgot-email" class="authentication-input" value="" data-clear-btn="true" type="text">
@@ -275,7 +307,7 @@
 				
 				
 				<div class="sy-signup-component" >	
-					<ul data-role="listview" data-inset="false" data-theme="a" >
+					<ul data-role="listview" data-inset="true" data-theme="a" >
 	                    <li class="ui-field-contain">
 	                        <label for="signup-display-name">Display Name:</label>
 	                        <input name="signup-display-name" id="signup-display-name" class="authentication-input" value="" data-clear-btn="true" type="text">
