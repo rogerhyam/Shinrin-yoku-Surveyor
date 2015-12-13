@@ -67,7 +67,7 @@
 					
 					<li data-icon="user" class="sy-user-logged-out" >
                        <a href="#login" data-transition="slide">
-                           <h2>Login / Sign Up</h2>
+                           <h2>Login / Register</h2>
                        </a>
                     </li>
 
@@ -188,7 +188,7 @@
 					<!-- display the login prompt if not logged in -->
                     <li id="sy-photo" data-icon="user" class="sy-user-logged-out">
 						<a href="#login" >
-                            <h2>Login / Sign Up</h2>
+                            <h2>Login / Register</h2>
 						</a>
                     </li>
 					
@@ -218,10 +218,17 @@
                  <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
              </div>
 
+             <div data-role="popup" id="survey-grounding-not-logged-in" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Congratulations</h3>
+                 <p>
+                     You completed a Ten Breaths practice.
+					 If you would like to save your sessions and contribute to mapping the
+					 places that inspire connection with nature you need to log in first.
+                </p>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
+             </div>
+
              <div data-role="popup" id="ten-breaths-save-popup" data-overlay-theme="b" data-theme="a" data-dismissible="false" style="max-width:400px;">
-                 <div data-role="header" data-theme="a">
-                 <h1>Save Location?</h1>
-                 </div>
                  <div role="main" class="ui-content">
                      <h3 class="ui-title">You haven't saved this location!</h3>
                      <p>Do you want to save or discard the ten breaths at this location? This can't be undone.</p>
@@ -269,7 +276,7 @@
 					<div data-role="navbar">
 						<ul>
 							<li><a id="sy-navbar-login" href="#" class="ui-btn-active ui-state-persist"  >Log In</a></li>
-							<li><a id="sy-navbar-signup" href="#">Sign Up</a></li>
+							<li><a id="sy-navbar-signup" href="#">Register</a></li>
 							<li><a id="sy-navbar-forgot" href="#">Forgot</a></li>
 						</ul>
 					</div><!-- /navbar -->
@@ -281,7 +288,7 @@
 					<ul data-role="listview" data-inset="true" data-theme="a"  >
 	                    <li class="ui-field-contain">
 	                        <label for="login-email">Email:</label>
-	                        <input name="login-email" id="login-email" class="authentication-input" value="" data-clear-btn="false" type="text">
+	                        <input name="login-email" id="login-email" class="authentication-input" value="" data-clear-btn="false" type="email">
 	                    </li>
 	                    <li class="ui-field-contain">
 	                        <label for="login-password">Password:</label>
@@ -297,7 +304,7 @@
 					<ul data-role="listview" data-inset="true" data-theme="a" >
 	                    <li class="ui-field-contain">
 	                        <label for="forgot-email">Email:</label>
-	                        <input name="forgot-email" id="forgot-email" class="authentication-input" value="" data-clear-btn="true" type="text">
+	                        <input name="forgot-email" id="forgot-email" class="authentication-input" value="" data-clear-btn="true" type="email">
 	                    </li>
 	                    <li class="ui-field-contain">
 							<button id="forgot-button" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right" >Reset Password</button>
@@ -314,14 +321,14 @@
 	                    </li>
 	                    <li class="ui-field-contain">
 	                        <label for="signup-email">Email:</label>
-	                        <input name="signup-email" id="signup-email" class="authentication-input" value="" data-clear-btn="true" type="text">
+	                        <input name="signup-email" id="signup-email" class="authentication-input" value="" data-clear-btn="true" type="email">
 	                    </li>
 	                    <li class="ui-field-contain">
 	                        <label for="signup-password">Password:</label>
 	                        <input name="signup-password" id="signup-password" class="authentication-input" value="" data-clear-btn="true" type="password">
 	                    </li>
 						<li class="ui-field-contain">
-							<button id="signup-button" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right" >Sign Up</button>
+							<button id="signup-button" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right" >Register</button>
 	                    </li>
 					</ul>
 				</div>

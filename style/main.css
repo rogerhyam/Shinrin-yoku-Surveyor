@@ -1,14 +1,11 @@
 #nav-panel li.home-menu-item a{
-	background-color: orange !important;
+	background-color: #e67e00 !important;
+	color: #fff3e5;
+	text-shadow: 1px 1px #000000;
 }
 
 #nav-panel{
 	/*background-color: transparent;*/
-}
-
-#nav-panel > div > ul > li.home-menu-item{
-	opacity: 1;
-	background-color: orange !important;
 }
 
 .ui-popup-screen{
@@ -40,9 +37,12 @@
 	border-radius: 20px !important;
 	margin-left: auto;
 	margin-right: auto;
-	background-color: orange;
+	background-color: #e67e00;
+	color: #fff3e5;
+	text-shadow: 1px 1px #000000;
 	box-shadow: 3px 3px 10px #333333;
 	font-size: 20px;
 	line-height: 90px;
+	
 }
 

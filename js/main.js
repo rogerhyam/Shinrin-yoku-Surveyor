@@ -403,7 +403,20 @@ shinrinyoku.stopBreathing = function(){
          }else{
 			 sysurvey.ten_breaths_completed = true;
              shinrinyoku.stopGps();
-			 shinrinyoku.setDisplayCompleted();
+			 
+			 
+			 // if we are logged in then go to complete mode
+			 // if we aren't logged in then we drop the survey and 
+			 // reset to start again
+			 if( window.localStorage.getItem('user_key')){
+			 	 shinrinyoku.setDisplayCompleted();
+			 }else{
+				 sysurvey = new ShinrinYokuSurvey();
+				 shinrinyoku.setDisplayReady();
+				 $('#survey-grounding-not-logged-in').popup('open');
+			 }
+			 
+			 
          }
 }
 
@@ -782,7 +795,7 @@ $(document).on('pageshow', '#ten-breaths', function(e, data) {
  */
 $(document).on('pagecreate', '#login', function(e, data) {
 	
-	// default is to show only login components
+	// defaults
 	$('.sy-login-component').show();
 	$('.sy-signup-component').hide();
 	$('.sy-forgot-component').hide();
@@ -938,6 +951,16 @@ $(document).on('pagecreate', '#login', function(e, data) {
 		console.log('remind you up');
 		// FIXME: incomplete
 	});
+	
+});
+
+// good to set state
+$(document).on('pagebeforeshow', '#outbox', function(e, data) {
+
+	// we always default to login
+	$('.sy-login-component').show();
+	$('.sy-signup-component').hide();
+	$('.sy-forgot-component').hide();
 	
 });
 
