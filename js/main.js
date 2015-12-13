@@ -507,6 +507,9 @@ shinrinyoku.setDisplayReady = function(){
     $('#sy-photo img').attr('src', '');
     $('#sy-photo-take').show();
 	
+	// hidden/public button is set to whatever they prefer
+	shinrinyoku.setPrefersPublic(shinrinyoku.prefersPublic());
+	
 }
 
 shinrinyoku.setDisplayBreathing = function(){	
@@ -544,6 +547,26 @@ shinrinyoku.setDisplayLogin = function(){
 	
 }
 
+shinrinyoku.prefersPublic = function(){
+	var prefers = window.localStorage.getItem('prefers-public');
+	if(prefers == null){
+		window.localStorage.setItem('prefers-public', JSON.stringify(false));
+		return false;
+	}else{
+		return JSON.parse(prefers);
+	}
+}
+
+shinrinyoku.setPrefersPublic = function(prefers){
+	window.localStorage.setItem('prefers-public', JSON.stringify(prefers));
+	if(prefers){
+		$('.sy-prefers-public').show();
+		$('.sy-prefers-hidden').hide();
+	}else{
+		$('.sy-prefers-public').hide();
+		$('.sy-prefers-hidden').show();
+	}
+}
 
 /*
  * The survey object class
@@ -685,9 +708,17 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
      });
 	 
 	 $('#ten-breaths-clear').on('click', function(){
-		 alert('clear me');
+		 sysurvey = new ShinrinYokuSurvey();
+		 shinrinyoku.setDisplayReady();
+		 $('#ten-breaths-clear').blur();
 	 });
      
+	 $('#ten-breaths-hidden').on('click', function(){
+		 shinrinyoku.setPrefersPublic(!shinrinyoku.prefersPublic()); 
+		 $('#ten-breaths-hidden').blur();
+	 });
+	 
+	 
      $('#sy-photo-take button').on('click', function(){
          
          // get out of here if you don't have a camera
@@ -744,6 +775,7 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          // save the survey - 
          var now = new Date();
          sysurvey.completed = now.getTime();
+		 sysurvey.public = shinrinyoku.prefersPublic();
          sysurvey.timezoneOffset = now.getTimezoneOffset();
          // not sure if daylight saving is always included...
          
