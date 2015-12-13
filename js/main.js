@@ -398,7 +398,9 @@ shinrinyoku.stopBreathing = function(){
 			 shinrinyoku.setDisplayReady();
          }else if(sysurvey.geolocation.error){
 			 // FIXME - nice error if we can't get a possition
-			 alert("No location!");
+			 alert(sysurvey.geolocation.error.code);
+			 alert(sysurvey.geolocation.error.message);
+			 
 			 shinrinyoku.setDisplayReady();
          }else{
 			 sysurvey.ten_breaths_completed = true;
