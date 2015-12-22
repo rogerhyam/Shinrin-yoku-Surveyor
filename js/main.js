@@ -80,6 +80,10 @@ shinrinyoku.stopGps = function(){
 
 shinrinyoku.onMoveSuccess = function(acceleration){
 	
+	// we have a dead zone we do nothing in near the balance point
+	// this prevents triggering multiple breaths 
+	if(acceleration.z > -2 && acceleration.z < 2) return;
+	
 	var grounding = sysurvey.groundings[sysurvey.groundings.length - 1];
 	
 	// if this is the first breathing record for this grounding run 
@@ -91,7 +95,7 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 		
 		var last_breath = grounding.breaths[grounding.breaths.length -1];
 		
-		// if we have changed direction of breath then create a new breath
+		// if we have changed direction of breath then create a new breath		
 		if (last_breath.breathing_in != (acceleration.z < 0)){
 			
 			var breath_count = grounding.breaths.push({started: acceleration.timestamp, breathing_in: acceleration.z < 0 });
