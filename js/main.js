@@ -205,9 +205,7 @@ shinrinyoku.submit = function(survey_ids, silent){
             url: shinrinyoku.submit_uri,
             type: 'POST',
             data: {
-                'survey': survey_string,
-                'user_key': window.localStorage.getItem('user_key'),
-                'device_key': window.localStorage.getItem('device_key')
+                'survey': survey_string
             },
             success: function(data, textStatus, xhr){
 
@@ -241,15 +239,8 @@ shinrinyoku.submit = function(survey_ids, silent){
             error: function(xhr, textStatus){
                 if(!silent){
                     $.mobile.loading( "hide" );
-					
-					// FIXME - THIS IS IRRELIVANT WITHOUT SURVEYOR 
-                    if(xhr.status == 409){
-                        $('#display-name-clash h3 span').html(surveyor.display_name);
-                        $('#display-name-clash').popup('open');
-                    }else{
-						$('#outbox-no-net span').html(xhr.status);
-						$('#outbox-no-net').popup('open');
-                    }
+                    $('#outbox-no-net span').html(xhr.status);
+                    $('#outbox-no-net').popup('open');
                 } // not silent
             }
         });
@@ -397,24 +388,23 @@ shinrinyoku.stopBreathing = function(){
              // $('#ten-breaths-start').text("Start");
 			 shinrinyoku.setDisplayReady();
          }else if(sysurvey.geolocation.error){
-			 // FIXME - nice error if we can't get a possition
+			 // FIXME - nice error if we can't get a position
 			 alert(sysurvey.geolocation.error.code);
 			 alert(sysurvey.geolocation.error.message);
-			 
 			 shinrinyoku.setDisplayReady();
          }else{
+             
+             // just right!
 			 sysurvey.ten_breaths_completed = true;
              shinrinyoku.stopGps();
-			 
-			 
+	 
 			 // if we are logged in then go to complete mode
 			 // if we aren't logged in then we drop the survey and 
 			 // reset to start again
 			 if( window.localStorage.getItem('user_key')){
 			 	 shinrinyoku.setDisplayCompleted();
 			 }else{
-				 sysurvey = new ShinrinYokuSurvey();
-				 shinrinyoku.setDisplayReady();
+				 shinrinyoku.resetSurvey();
 				 $('#survey-grounding-not-logged-in').popup('open');
 			 }
 			 
@@ -575,6 +565,12 @@ function ShinrinYokuSurvey(){
     
     // give it a uuid
     this.id = shinrinyoku.getRandomId();
+    
+    // tag it with the key for the current user (if there is one)
+    this.user_key = window.localStorage.getItem('user_key');
+    
+    // tag it with the device key
+    this.device_key = window.localStorage.getItem('device_key');
     
     this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
     this.complete = false; // time they finished survey and clicked save
