@@ -569,7 +569,7 @@ function ShinrinYokuSurvey(){
     // tag it with the key for the current user (if there is one)
     this.user_key = window.localStorage.getItem('user_key');
     
-    // tag it with the device key
+    // tag it with the device key - dd
     this.device_key = window.localStorage.getItem('device_key');
     
     this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
