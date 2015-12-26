@@ -719,7 +719,7 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
 	 });
 	 
 	 
-     $('#sy-photo-take button').on('click', function(){
+     $('#ten-breaths-photo').on('click', function(){
          
          // get out of here if you don't have a camera
          if(typeof Camera === 'undefined'){
@@ -775,7 +775,7 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          // save the survey - 
          var now = new Date();
          sysurvey.completed = now.getTime();
-		 sysurvey.public = shinrinyoku.prefersPublic();
+		 sysurvey.public = shinrinyoku.prefersPublic()? 1 : 0;
          sysurvey.timezoneOffset = now.getTimezoneOffset();
          // not sure if daylight saving is always included...
          
