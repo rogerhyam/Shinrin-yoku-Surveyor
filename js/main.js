@@ -133,16 +133,28 @@ shinrinyoku.onPhotoSuccess = function(imageData){
     sysurvey.photo = imageData;
     
     // display it.
-    $('#sy-photo img').attr('src',  imageData);
-	shinrinyoku.scaleThumbnail($('#sy-photo img'));
-    $('#sy-photo-take').hide();
-    $('#sy-photo').show('slow');
+    $('#ten-breaths-photo-display img').attr('src', imageData);
+	$('#ten-breaths-photo-display').show('slow');
+	$('#ten-breaths-photo').addClass('sy-alert');
     
 }
 
 shinrinyoku.onPhotoError = function(message){
     // fixme this should be a proper popup
     alert(message);
+	
+}
+
+shinrinyoku.removePhoto = function(){
+	
+    // write it to the survey object
+    sysurvey.photo = false;
+    
+    // display it.
+	$('#ten-breaths-photo-display').hide('slow');
+    $('#ten-breaths-photo-display img').attr('src', '');
+	$('#ten-breaths-photo').addClass('sy-alert');
+	
 }
 
 shinrinyoku.getBox = function(box_name){
@@ -497,9 +509,9 @@ shinrinyoku.setDisplayReady = function(){
     $('#ten-breaths-text').val('');
     
     // no photo at start
-    $('#sy-photo').hide();
-    $('#sy-photo img').attr('src', '');
-    $('#sy-photo-take').show();
+	$('#ten-breaths-photo-display').hide('slow');
+    $('#ten-breaths-photo-display img').attr('src', '');
+	$('#ten-breaths-photo').removeClass('sy-alert');
 	
 	// hidden/public button is set to whatever they prefer
 	shinrinyoku.setPrefersPublic(shinrinyoku.prefersPublic());
@@ -554,11 +566,13 @@ shinrinyoku.prefersPublic = function(){
 shinrinyoku.setPrefersPublic = function(prefers){
 	window.localStorage.setItem('prefers-public', JSON.stringify(prefers));
 	if(prefers){
-		$('.sy-prefers-public').show();
-		$('.sy-prefers-hidden').hide();
+		$('#ten-breaths-hidden').removeClass('sy-alert');
+		//$('.sy-prefers-public').show();
+		//$('.sy-prefers-hidden').hide();
 	}else{
-		$('.sy-prefers-public').hide();
-		$('.sy-prefers-hidden').show();
+		$('#ten-breaths-hidden').addClass('sy-alert');
+		//$('.sy-prefers-public').hide();
+		//$('.sy-prefers-hidden').show();
 	}
 }
 
@@ -721,27 +735,38 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
 	 
      $('#ten-breaths-photo').on('click', function(){
          
+		 $('#ten-breaths-photo').blur();
+		 
          // get out of here if you don't have a camera
          if(typeof Camera === 'undefined'){
              alert('Sorry. There is no camera access');
              return;
          }
+		 
+		 // if we already have a photo then we delete it
+		 if(sysurvey.photo){
+			 shinrinyoku.removePhoto();
+		 }else{
+			 
+	         navigator.camera.getPicture(
+	             shinrinyoku.onPhotoSuccess,
+	             shinrinyoku.onPhotoError, 
+	             { 
+	               quality: 75,
+	               destinationType: Camera.DestinationType.FILE_URI,
+	               sourceType: Camera.PictureSourceType.CAMERA,
+	               allowEdit: false,
+	               correctOrientation: true,
+	               encodingType: Camera.EncodingType.JPEG,
+	               targetWidth: 1024,
+	               targetHeight: 1024,
+	               saveToPhotoAlbum: true
+	             }
+	          );
+		 
+		 }
          
-         navigator.camera.getPicture(
-             shinrinyoku.onPhotoSuccess,
-             shinrinyoku.onPhotoError, 
-             { 
-               quality: 75,
-               destinationType: Camera.DestinationType.FILE_URI,
-               sourceType: Camera.PictureSourceType.CAMERA,
-               allowEdit: false,
-               correctOrientation: true,
-               encodingType: Camera.EncodingType.JPEG,
-               targetWidth: 1024,
-               targetHeight: 1024,
-               saveToPhotoAlbum: true
-             }
-             );
+
          
      });
      
@@ -857,14 +882,17 @@ $(document).on('pagecreate', '#login', function(e, data) {
 	
 	// when the popup is closed we go home if authentication
 	// process has lead to them being logged in.
+	/*
 	$( "#login-popup" ).on( "popupafterclose", function( event, ui ) {
 		$("body").pagecontainer("change", "#ten-breaths");
 	});
+	*/
 	
 	// submit signup
 	$('#signup-button').on('click', function(){
 		console.log('Sign you up');
 		console.log($('#signup-password').val());
+		$('#login-popup').data('next-page-name', false);
 		
 		$.mobile.loading( "show" );
 		// call server and look for response
@@ -886,12 +914,14 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					// they will have been given a user key
 					window.localStorage.setItem('user_key', data.userKey);
 					window.localStorage.setItem('user_display_name', data.displayName);
+					$('#login-popup').data('next-page-name', '#ten-breaths');
 					
 					shinrinyoku.setDisplayLogin();
 					
 					// this time when they close the popup they are taken to the home page
 					$('#login-popup-title').html("Sign Up Successful");
 					$('#login-popup-message').html("<p>You are now logged in.</p><p>You have been sent an email to confirm your address.</p>");
+					
 					
 				}else{
 					
@@ -934,6 +964,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 	// submit login
 	$('#login-button').on('click', function(){
 		console.log('log you in');
+		$('#login-popup').data('next-page-name', false);
 		
 		$.mobile.loading( "show" );
 		// call server and look for response
@@ -954,7 +985,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					// they will have been given a user key
 					window.localStorage.setItem('user_key', data.userKey);
 					window.localStorage.setItem('user_display_name', data.displayName);
-		
+					
 					shinrinyoku.setDisplayLogin();
 					
 					$("body").pagecontainer("change", "#ten-breaths");					
@@ -984,6 +1015,19 @@ $(document).on('pagecreate', '#login', function(e, data) {
 	$('#forgot-button').on('click', function(){
 		console.log('remind you up');
 		// FIXME: incomplete
+	});
+	
+	// closing login popup has different behaviours
+	$('#sy-email-popup-ok').on('click', function(){
+		
+		console.log('closing login');
+		
+		var nextPageName = $('#login-popup').data('next-page-name');
+		if(!nextPageName){
+			$('#login-popup').popup('close');
+		}else{
+			$("body").pagecontainer("change", nextPageName);
+		}
 	});
 	
 });

@@ -133,73 +133,78 @@
 
              <div role="main" class="ui-content" >
 
-                <ul data-role="listview" data-inset="false">
-
-                    <li  class="ui-field-contain" >
-                        <button
-							id="ten-breaths-start"
-							class="ui-btn ui-corner-all"
-							href="#"
-						 >Take Ten</button>
-                    </li>
-
-                    <li class="ui-field-contain" >
-                         <textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
-                    </li>
-                    <li id="sy-photo" data-icon="delete" ><a href="#">
-                            <div class="thumbnail-wrapper"><img src=""></div>
-                            <h2>Delete</h2>
-                            <p>Remove the photo (can't be undone)</p>
-                        </a>
-                    </li>
-
-                    <li id="sy-button-grid">
-						<div class="ui-grid-a">
-						    <div class="ui-block-a">
-								<button id="ten-breaths-hidden" class="ui-btn ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-top" >
-									<span class='sy-prefers-public' >Public</span>
-									<span class='sy-prefers-hidden' >Hidden</span>
-								</button>
-							</div>
-						    <div class="ui-block-b">
-								 <button id="ten-breaths-photo" class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-top" >Add Photo</button>
-							</div>
-						    <div class="ui-block-a">
-								<button
-									id="ten-breaths-clear"
-									class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-top"
-									
-									>Clear</button>
-							</div>
-						    <div class="ui-block-b">
-								<button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-top" >Save</button>
-								<!-- <button id="ten-breaths-login2save" class="ui-btn ui-corner-all ui-btn-a ui-icon-user ui-btn-icon-right" >Login to Save</button> -->
-							</div>
-						</div>
-                    </li>
-				</ul>
+				<!-- Big Button to press -->
+				<div class="ui-grid-solo">
+					<div class="ui-block-a">
+	                    <li  class="ui-field-contain" >
+	                        <button
+								id="ten-breaths-start"
+								class="ui-btn ui-corner-all"
+								href="#"
+							 >Take Ten</button>
+	                    </li>
+					</div>
+				</div>
 				
-				<ul data-role="listview" data-inset="true">
-					
-					<!-- display the username if logged in -->
-                    <li data-icon="user" class="sy-user-logged-in sy-user-logout">
-						<a href="#">
-                            <h2 class="sy-user-display-name"></h2>
-						</a>
-                    </li>
-					
-					<!-- display the login prompt if not logged in -->
-                    <li id="sy-photo" data-icon="user" class="sy-user-logged-out">
-						<a href="#login" >
-                            <h2>Login / Register</h2>
-						</a>
-                    </li>
-					
-                 </ul>
+				<!-- input a comment -->
+				<div class="ui-grid-solo">
+					<div class="ui-block-a">
+						<textarea cols="40" name="ten-breaths-text" id="ten-breaths-text" placeholder="Some words that describe your experience of this place (optional)"></textarea>
+					</div>
+				</div>
+				
+				<!-- The button grid -->
+				<div class="ui-grid-a" id="sy-button-grid" >
 
+				    <div class="ui-block-a">
+						<button
+							id="ten-breaths-hidden"
+							class="ui-btn ui-corner-all ui-btn-a ui-icon-eye ui-btn-icon-top"
+							>
+								<span class='sy-prefers-public' >Public</span>
+								<span class='sy-prefers-hidden' >Hidden</span>
+						</button>
+					</div>
+				    <div class="ui-block-b">
+						 <button
+						 	id="ten-breaths-photo"
+							class="ui-btn ui-corner-all ui-btn-a ui-icon-camera ui-btn-icon-top"
+							 >
+								<span class='sy-no-photo' >Add Photo</span>
+								<span class='sy-has-photo' >Remove Photo</span>
+							</button>
+					</div>
+				    <div class="ui-block-a">
+						<button
+							id="ten-breaths-clear"
+							class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-top"
+							>Clear</button>
+					</div>
+				    <div class="ui-block-b">
+						<button id="ten-breaths-save" class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-top" >Save</button>
+					</div>
+				</div>
+				
+				<!-- display the login prompt if not logged in -->
+				<div class="ui-grid-solo sy-user-logged-out">
+					<div class="ui-block-a">
+						<a href="#login"  class="ui-btn ui-btn-a ui-corner-all ui-icon-user ui-btn-icon-right">
+                            Login / Register
+						</a>
+					</div>
+				</div>
 
-             </div>
+				<!-- Display the associated photo -->
+				<div id="ten-breaths-photo-display" class="ui-grid-solo">
+					<div class="ui-block-a">
+						<img src="" />
+					</div>
+				</div>
+	
+
+             </div> <!-- page content end -->
 			 
+
 
 			<div data-role="popup" id="survey-grounding-slow" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
 				<h3>
@@ -345,7 +350,7 @@
                 <div role="main" class="ui-content">
                     <h3 id="login-popup-title"></h3>
                     <p id="login-popup-message"></p>
-                    <a href="#" data-rel="back" id="surveyor-email-popup-ok" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">OK</a>
+                    <a href="#" id="sy-email-popup-ok" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">OK</a>
                 </div>
             </div>
 

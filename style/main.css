@@ -46,3 +46,46 @@
 	
 }
 
+#ten-breaths-photo-display img{
+	width: 100%;
+}
+
+
+/* red icon #c20000 */
+#ten-breaths-save:after {
+  background-color: #1ac200;
+}
+#ten-breaths-clear:after {
+  background-color: #4da6ff;
+}
+
+/* photo & hidden button  and states */
+#ten-breaths-hidden:after,
+#ten-breaths-photo:after {
+  background-color: #1ac200;
+}
+
+#ten-breaths-hidden.sy-alert:after,
+#ten-breaths-photo.sy-alert:after{
+  background-color: #c20000;
+}
+
+#ten-breaths-hidden.sy-alert span.sy-prefers-public,
+#ten-breaths-photo.sy-alert span.sy-no-photo{
+	display:none;
+}
+
+#ten-breaths-hidden.sy-alert span.sy-prefers-hidden,
+#ten-breaths-photo.sy-alert span.sy-has-photo{
+	display:inline;
+}
+
+#ten-breaths-hidden span.sy-prefers-public,
+#ten-breaths-photo span.sy-no-photo{
+	display:inline;
+}
+
+#ten-breaths-hidden span.sy-prefers-hidden,
+#ten-breaths-photo span.sy-has-photo{
+	display:none;
+}
