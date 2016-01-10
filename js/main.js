@@ -3,7 +3,7 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
-shinrinyoku.developer_mode = true;
+shinrinyoku.developer_mode = false;
 
 // two different sites we could submit to
 shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
@@ -896,6 +896,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 		
 		$.mobile.loading( "show" );
 		// call server and look for response
+		console.log('about to send sign up');
         $.ajax({
             url: shinrinyoku.submit_uri,
             type: 'POST',
@@ -958,6 +959,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					
              }
         });
+		console.log('signup request sent');
 		
 	});
 	
@@ -1033,7 +1035,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 });
 
 // good to set state
-$(document).on('pagebeforeshow', '#outbox', function(e, data) {
+$(document).on('pagebeforeshow', '#login', function(e, data) {
 
 	// we always default to login
 	$('.sy-login-component').show();
