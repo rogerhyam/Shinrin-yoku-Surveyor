@@ -77,7 +77,7 @@
                      </a>
                     </li>
                     <li data-icon="action" >
-                     <a href="#" onclick="var ref = window.open('http://tenbreaths.rbge.info', '_system');">
+                     <a id="menu-map-link" href="#">
                          <h2>The Map</h2>
                      </a>
                     </li>
@@ -630,29 +630,15 @@
              </div>
 
              <div data-role="footer" data-position="fixed" >
-                 <a href="#clear-history-confirm" id="clear-history-button" data-position-to="window" data-rel="popup" class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Empty</a>
+                 <a
+				 	href="#clear-history-confirm-popup"
+					id="clear-history-button"
+					data-position-to="window"
+					data-transition="slideup"
+					data-rel="popup"
+					class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action">Empty</a>
              </div>
              
-			 <!-- Clear History popup -- >
-             <div data-role="popup" id="clear-history-confirm" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
-                 <div data-role="header" data-theme="a">
-                 <h1>Clear History?</h1>
-                 </div>
-                 <div role="main" class="ui-content">
-                     <h3 class="ui-title">Are you sure you want to clear the history?</h3>
-                     <p>This will remove the list of surveys from this device but not the map server.</p>
-                     <p>This action cannot be undone.</p>
-                     <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancel</a>
-                     <a 
-					 	href="#"
-						id="clear-history-confirm-button"
-						class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
-						data-rel="back"
-						data-transition="flow"
-					>Clear History</a>
-                 </div>
-             </div>
-
 			 <!-- History Help -->
              <div data-role="popup" id="history-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                  <h3>History Help</h3>
@@ -662,6 +648,21 @@
                  <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
              </div>
 
+			 <!-- Clear History popup -- >			 
+             <div data-role="popup" id="clear-history-confirm-popup" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
+                 <h3>Are you sure you want to clear the history?</h3>
+                  <p>This will remove the list of surveys from this device but not the map server.</p>
+                  <p>This action cannot be undone.</p>
+                  <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancel</a>
+                  <a 
+				 	href="#"
+					id="clear-history-confirm-button"
+					class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+					data-rel="back"
+					data-transition="flow"
+				>Clear History</a>
+             </div>
+			 
         </div>
 
          <!-- Developer Page -->

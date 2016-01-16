@@ -5,14 +5,16 @@
 var shinrinyoku = {};
 shinrinyoku.developer_mode = false;
 
+
 // two different sites we could submit to
 shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
 shinrinyoku.submit_uri_dev = 'https://shinrin-yoku-server-rogerhyam-1.c9.io/submit/index.php';
 
 // default to the live site
-// shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
-shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev;
-
+shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
+//shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev;
+//shinrinyoku.map_uri = "https://shinrin-yoku-server-rogerhyam-1.c9.io/index.php";
+shinrinyoku.map_uri = "http://tenbreaths.rbge.info/index.php";
 
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
@@ -675,6 +677,19 @@ $( function() {
 	 // update for if we are logged in or not
 	 shinrinyoku.setDisplayLogin();
 	 
+	 // links on the menu block
+	 $('#menu-map-link').on('click', function(){
+		 
+		 var mapUri = shinrinyoku.map_uri;
+		 var accessToken = localStorage.getItem('access_token');
+		 if(accessToken){
+			 mapUri = mapUri + '?t=' + accessToken;
+		 }
+		// if we have a user access key we add it to the 
+	 	 window.open(mapUri, '_system');
+		 
+	 });
+	 
 	 
 });
  
@@ -987,6 +1002,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					// they will have been given a user key
 					window.localStorage.setItem('user_key', data.userKey);
 					window.localStorage.setItem('user_display_name', data.displayName);
+					window.localStorage.setItem('access_token', data.accessToken);
 					
 					shinrinyoku.setDisplayLogin();
 					
@@ -1200,7 +1216,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          }
          a1.append(p);
          
-         var survey_url = 'http://tenbreaths.rbge.info/index.php?survey=' + survey.id;
+         var survey_url = shinrinyoku.map_uri + '?survey=' + survey.id + '&t=' + localStorage.getItem('access_token');
          a1.data('survey-url', survey_url);
         
          // listen for view item request
