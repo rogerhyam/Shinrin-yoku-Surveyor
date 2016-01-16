@@ -3,24 +3,43 @@
 
 // set up a namespace so we can have non-coliding functions
 var shinrinyoku = {};
+
 shinrinyoku.developer_mode = false;
 
-
-// two different sites we could submit to
-shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info/submit/index.php';
-shinrinyoku.submit_uri_dev = 'https://shinrin-yoku-server-rogerhyam-1.c9.io/submit/index.php';
-
-// default to the live site
-shinrinyoku.submit_uri = shinrinyoku.submit_uri_live;
-//shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev;
-//shinrinyoku.map_uri = "https://shinrin-yoku-server-rogerhyam-1.c9.io/index.php";
-shinrinyoku.map_uri = "http://tenbreaths.rbge.info/index.php";
+// two different sites we could interface with 
+shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info';
+shinrinyoku.submit_uri_dev = 'https://shinrin-yoku-server-rogerhyam-1.c9.io';
 
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
 shinrinyoku.max_breaths_duration_default = 90;
 shinrinyoku.min_breaths_duration_developer = 1;
 shinrinyoku.max_breaths_duration_developer = 10;
+
+shinrinyoku.setSubmitToLive = function(goLive){
+	
+	console.log("golive = " + goLive);
+	
+	if(goLive){
+		console.log("submitting to live");
+		shinrinyoku.submit_live = true;
+		shinrinyoku.submit_uri = shinrinyoku.submit_uri_live + '/submit/index.php';
+		shinrinyoku.map_uri = shinrinyoku.submit_uri_live + "/index.php";
+	}else{
+		console.log("submitting to dev");
+		shinrinyoku.submit_live = false;
+		shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev + '/submit/index.php';
+		shinrinyoku.map_uri = shinrinyoku.submit_uri_dev + "/index.php";
+	}
+	
+	 // display the current values
+	 $('#developer-show-map-uri').html(shinrinyoku.map_uri);
+	 $('#developer-show-submit-uri').html(shinrinyoku.submit_uri);
+	 $('#developer-show-mode').html(shinrinyoku.developer_mode ? "DEV MODE" : "NORMAL MODE");
+
+}
+// default to the live site
+shinrinyoku.setSubmitToLive(true);
 
 shinrinyoku.getRandomId = function(){
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -233,7 +252,13 @@ shinrinyoku.submit = function(survey_ids, silent){
                 // move from the out to history boxes
                 for(var j=0; j < outbox.length; j++){
                     if(outbox[j].id == survey_id){
-                        history.push(outbox[j]);
+						
+						// add it to the front of the history so they appear decending
+                        history.unshift(outbox[j]); 
+						
+						// truncate the history at 30
+						if(history.length > 30) history = history.slice(0,29);
+						
                         outbox.splice(j, 1);
                         break;
                     }
@@ -591,6 +616,13 @@ function ShinrinYokuSurvey(){
     
     // tag it with the device key - dd
     this.device_key = window.localStorage.getItem('device_key');
+	
+	// if we have the AppVersion plugin we can add 
+	// the version of the software we are on
+	if(typeof AppVersion !== 'undefined' ){
+		this.app_version = AppVersion.version;
+		this.app_build = AppVersion.build;
+	}
     
     this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
     this.complete = false; // time they finished survey and clicked save
@@ -657,6 +689,9 @@ $( function() {
 	 $('#ten-breaths-logout-popup-confirm').on('click', function(){
 		 localStorage.removeItem('user_key');
 		 localStorage.removeItem('user_display_name');
+		 localStorage.removeItem('access_token');
+		 localStorage.removeItem('history');
+		 localStorage.removeItem('outbox');
 		 shinrinyoku.setDisplayLogin();
          $("body").pagecontainer("change", "#ten-breaths");
 	 });
@@ -930,6 +965,7 @@ $(document).on('pagecreate', '#login', function(e, data) {
 					// they will have been given a user key
 					window.localStorage.setItem('user_key', data.userKey);
 					window.localStorage.setItem('user_display_name', data.displayName);
+					window.localStorage.setItem('access_token', data.accessToken);
 					$('#login-popup').data('next-page-name', '#ten-breaths');
 					
 					shinrinyoku.setDisplayLogin();
@@ -1173,12 +1209,7 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
  */
  // good to add listeners
  $(document).on('pagecreate', '#history', function(e, data) {
-     
-     $('#clear-history-confirm-button').on('click', function(){
-         shinrinyoku.saveBox('history',[]);
-         $('div#history div.ui-content ul').empty();
-         $('clear-history-confirm').popup('close');
-     });
+  
      
  });
  
@@ -1230,11 +1261,8 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
      $('div#history div.ui-content ul').listview().listview('refresh');
      
      // we can only empty a history if we have one
-     if(history.length > 0){
-         $('#clear-history-button').removeClass('ui-disabled');
-     }else{
-         $('#clear-history-button').addClass('ui-disabled');
-          var li = $('<li data-theme="b">History is empty.</li>');
+     if(history.length == 0){
+          var li = $('<li data-theme="b">Recent surveys is empty.</li>');
           $('div#history div.ui-content ul').append(li).trigger('create');
           $('div#history div.ui-content ul').listview().listview('refresh');
      }
@@ -1277,35 +1305,47 @@ $(document).on('pagecreate', '#about', function(e, data) {
  *  D E V E L O P E R - P A G E
  */
  // good to set state
+
  $(document).on('pagebeforeshow', '#developer', function(e, data) {
     
+	 console.log('dev before');
+	
      $('#developer-mode').prop('checked', shinrinyoku.developer_mode).checkboxradio('refresh');
      
      //set the values of the check buttons correctly
-     $('#developer-submit-uri-dev').val(shinrinyoku.submit_uri_dev);
-     $('#developer-submit-uri-live').val(shinrinyoku.submit_uri_live);
-     
-     // check the one we are using at the moment
-     $('input[name=developer-submit-uri][value="' +  shinrinyoku.submit_uri + '"]').attr('checked', true).checkboxradio("refresh");
+	 if(shinrinyoku.submit_live){
+	 	$('#developer-submit-uri-live').attr('checked', true).checkboxradio("refresh");
+	 }else{
+	 	$('#developer-submit-uri-dev').attr('checked', true).checkboxradio("refresh");
+	 }
      
  });
+
  // good to add listeners
  $(document).on('pagecreate', '#developer', function(e, data) {
+ 
+	 console.log('dev create');
  
     $('#developer-save-button').on('click', function(){
         
         shinrinyoku.developer_mode = $('#developer-mode').prop('checked');
-        shinrinyoku.submit_uri = $('input[name=developer-submit-uri]:checked').val();
-        
-        // turn the page back
+	
+		if( $("#developer input[type='radio']:checked").val() == 'live' ){
+			shinrinyoku.setSubmitToLive(true);
+		}else{
+			shinrinyoku.setSubmitToLive(false);
+		}
+		
+		// turn the page back
+		/*
         $("body").pagecontainer("change", "#about", {
                   transition: 'flip',
                   reverse: true
         });
-
+		*/
     });
      
  });
  
-    
+
 

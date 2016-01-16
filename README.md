@@ -43,6 +43,8 @@ cordova-plugin-geolocation 2.0.1-dev "Geolocation"
 cordova-plugin-vibration 2.0.0 "Vibration"
 cordova-plugin-whitelist 1.2.0 "Whitelist"
 
+cordova plugin add cordova-plugin-appversion
+
 Version 2
 =========
 
