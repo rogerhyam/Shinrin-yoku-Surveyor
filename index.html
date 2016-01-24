@@ -67,7 +67,7 @@
 					
 					<li data-icon="user" class="sy-user-logged-out" >
                        <a href="#login" data-transition="slide">
-                           <h2>Login / Register</h2>
+                           <h2>Login / Sign Up</h2>
                        </a>
                     </li>
 
@@ -205,7 +205,7 @@
 				<div class="ui-grid-solo sy-user-logged-out">
 					<div class="ui-block-a">
 						<a href="#login"  class="ui-btn ui-btn-a ui-corner-all ui-icon-user ui-btn-icon-right">
-                            Login / Register
+                            Login / Sign Up
 						</a>
 					</div>
 				</div>
@@ -344,7 +344,7 @@
 					<div data-role="navbar">
 						<ul>
 							<li><a id="sy-navbar-login" href="#" class="ui-btn-active ui-state-persist"  >Log In</a></li>
-							<li><a id="sy-navbar-signup" href="#">Register</a></li>
+							<li><a id="sy-navbar-signup" href="#">Sign Up</a></li>
 							<li><a id="sy-navbar-forgot" href="#">Forgot</a></li>
 						</ul>
 					</div><!-- /navbar -->
@@ -361,7 +361,7 @@
 	                        <input
 								name="login-email"
 								id="login-email"
-								class="authentication-input"
+								class="authentication-input email-input"
 								value=""
 								data-clear-btn="true"
 								type="email"
@@ -395,10 +395,21 @@
 	                        <input
 								name="forgot-email"
 								id="forgot-email"
-								class="authentication-input"
+								class="authentication-input email-input"
 								value=""
 								data-clear-btn="true"
 								type="email"
+							 >
+	                    </li>
+	                    <li class="ui-field-contain">
+	                        <label for="forgot-email">New Password:</label>
+	                        <input
+								name="new-password"
+								id="new-password"
+								class="authentication-input"
+								value=""
+								data-clear-btn="true"
+								type="password"
 							 >
 	                    </li>
 	                    <li class="ui-field-contain">
@@ -429,7 +440,7 @@
 	                        <input
 								name="signup-email"
 								id="signup-email"
-								class="authentication-input"
+								class="authentication-input email-input"
 								value=""
 								data-clear-btn="true"
 								type="email"
@@ -450,7 +461,7 @@
 							<button
 								id="signup-button"
 								class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right"
-							>Register</button>
+							>Sign Up</button>
 	                    </li>
 					</ul>
 				</div>

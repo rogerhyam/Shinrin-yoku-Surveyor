@@ -124,10 +124,10 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 			// quit on count of 20 turns quit
 			// give a blip of vibration as haptic feedback
 			if(breath_count > 20){
-                if(navigator.vibrate) navigator.vibrate([300]);
+                if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
 				shinrinyoku.stopBreathing();
 			}else{
-				if(navigator.vibrate) navigator.vibrate([1]);
+				if(navigator.vibrate) navigator.vibrate([100]);
 			}
 		
 		}
@@ -331,7 +331,7 @@ shinrinyoku.submitPhoto = function(survey, silent){
 shinrinyoku.startBreathing = function(){
          
 		// haptic feedback on this button
-    	if(navigator.vibrate) navigator.vibrate([1]);
+    	if(navigator.vibrate) navigator.vibrate([20]);
 		 
          var d = new Date();
          
@@ -1067,8 +1067,68 @@ $(document).on('pagecreate', '#login', function(e, data) {
 	
 	// submit forgot
 	$('#forgot-button').on('click', function(){
+		
 		console.log('remind you up');
-		// FIXME: incomplete
+		
+		$.mobile.loading( "show" );
+		// call server and look for response
+        $.ajax({
+            url: shinrinyoku.submit_uri,
+            type: 'POST',
+            data: {
+				'authentication': 'forgot',
+				'email': $('#forgot-email').val(),
+                'password': $('#new-password').val()
+            },
+            success: function(data, textStatus, xhr){
+
+                $.mobile.loading( "hide" );
+				console.log(data);
+				if(data.success){
+					
+					$('#login-popup-title').html("Now check your email");
+					$('#login-popup-message').html(
+						"<p>You have been sent an email with a link you must click to activate your new password."
+						+ "Until you click that link your old password will continue to work.</p>"
+					);
+					$('#login-popup').popup('open');				
+										
+				}else{
+					$('#login-popup-title').html("Password change failed");
+					$('#login-popup-message').html("<p>Sorry. We couldn't change your password. Did you type your email correctly?</p>");
+					$('#login-popup').popup('open');
+				}
+				
+            },
+            error: function(xhr, textStatus){
+                    $.mobile.loading( "hide" );
+                    console.log(xhr);
+					console.log(textStatus);
+					$('#login-popup-title').html("Authentication Error");
+					$('#login-popup-message').html("There was a problem connecting to the server. Please try again later.");
+					$('#login-popup').popup('open');
+             }
+        });
+	
+	});
+	
+	// we keep track of the last typed email as it is a pain to re-enter it all the time
+	$('.email-input').on('keyup', function(event){
+		
+		var val = $(this).val();
+
+		// save it to local storage
+		window.localStorage.setItem('last-email', val);
+		
+		// update any other email fields with the same value
+		// care not to go into loop of changing the same one
+		$( ".email-input" ).each(function(){
+			if($(this).val() != val){
+				$( this ).val(val);
+				
+			}
+		});
+			
 	});
 	
 	// closing login popup has different behaviours
@@ -1093,6 +1153,10 @@ $(document).on('pagebeforeshow', '#login', function(e, data) {
 	$('.sy-login-component').show();
 	$('.sy-signup-component').hide();
 	$('.sy-forgot-component').hide();
+	
+	// set the email to the last one used
+	var lastEmail = window.localStorage.getItem('last-email');
+	$('.email-input').val(lastEmail);
 	
 });
 
