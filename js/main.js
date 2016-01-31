@@ -10,6 +10,9 @@ shinrinyoku.developer_mode = false;
 shinrinyoku.submit_uri_live = 'http://tenbreaths.rbge.info';
 shinrinyoku.submit_uri_dev = 'https://shinrin-yoku-server-rogerhyam-1.c9.io';
 
+// feedback emails should go to?
+shinrinyoku.feedback_address = 'r.hyam@rbge.org.uk';
+
 // duration of concious breaths
 shinrinyoku.min_breaths_duration_default = 30;
 shinrinyoku.max_breaths_duration_default = 90;
@@ -725,6 +728,10 @@ $( function() {
 		 
 	 });
 	 
+	 $('#menu-feedback-link').on('click', function(){
+		 var subject = encodeURIComponent('Ten Breaths Map: Feedback');
+	 	 window.open('mailto:' + shinrinyoku.feedback_address + '?subject=' + subject);
+	 }); 
 	 
 });
  
@@ -884,6 +891,13 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          shinrinyoku.resetSurvey();
         
      });
+	 
+	 // the first run popup closure
+	 $('#ten-breaths-first-run-popup-close').on('click', function(){
+		 window.localStorage.setItem('first-run-popup-seen', 'true');
+		 $('#ten-breaths-first-run-popup').popup('close');
+	 });
+	 
      
 });
 
@@ -894,8 +908,15 @@ $(document).on('pagebeforeshow', '#ten-breaths', function(e, data) {
      shinrinyoku.resetSurvey();
 });
 
+
 $(document).on('pageshow', '#ten-breaths', function(e, data) {
-	 
+	
+    if (!window.localStorage.getItem('first-run-popup-seen')) {
+		setTimeout(function () {		
+	      $('#ten-breaths-first-run-popup').popup('open', { positionTo: '#ten-breaths-back' });
+	    }, 100); // delay above zero
+	}
+	
 });
 
 /*

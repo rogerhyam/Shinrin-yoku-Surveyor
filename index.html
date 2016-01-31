@@ -73,7 +73,7 @@
 
                     <li data-icon="action" >
                      <a href="#">
-                         <h2>Tutorial</h2>
+                         <h2>Video Tutorial</h2>
                      </a>
                     </li>
                     <li data-icon="action" >
@@ -85,6 +85,12 @@
 					<li data-icon="info" >
                        <a href="#about" data-transition="slide">
                            <h2>About</h2>
+                       </a>
+                    </li>
+					
+					<li data-icon="action" >
+                       <a href="#" id="menu-feedback-link">
+                           <h2>Feedback</h2>
                        </a>
                     </li>
 					
@@ -307,6 +313,24 @@
                       <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" >OK</a>
                   </div>
              </div>
+			 
+	 		<!-- First Run Popup -->
+	         <div data-role="popup" id="ten-breaths-first-run-popup" data-theme="a" data-dismissible="false" data-arrow="t">		
+	             <div role="main" class="ui-content">
+	                 <h3 class="ui-title">Welcome</h3>
+	                 <p>You can access everything you need via the menu on the top left.</p>
+	 				<p>
+	 					You may like to start by 
+	 					watching the <strong>Video Tutorial</strong> or reading the <strong>About</strong> page.
+	 				</p>
+	                 <a
+	 					href="#"
+	 					id="ten-breaths-first-run-popup-close"
+	 					class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a"
+	 					data-transition="flow"
+	 				>OK</a>
+	             </div>
+	         </div><!-- end first run -->
 
 			 <!-- Ten Breaths help -->
              <div
@@ -317,7 +341,21 @@
 				class="ui-content ui-corner-all"
 			 >
                  <h3>Ten Breaths Help</h3>
-                 <p>We use this to help us arrive in the location</p>
+				 <p>Tap the orange "Take Ten" button</p>
+				 <p>Take your attention to an object of beauty you find calming and hold it there.</p>
+				 <p>
+					 As you breath <strong>in</strong> turn the phone so the screen faces <strong>up</strong>.
+				 	 As you breath <strong>out</strong> turn the phone so that the screen faces <strong>down</strong>.
+					 The phone does a little buzz each time your breath changes direction.
+				 </p>
+				 <p>Stay aware of the object, your breathing and your body as you rock the phone back and forth.</p>
+				 <p>
+					 After ten breaths the phone will give two longer buzzes to show you have finished the cycle.
+					 If you like you can carry on breathing and enjoying the object. Perhaps silently giving thanks.
+				 </p>
+				 <p>If you are logged in then you can add a few words and a photo before saving your session to the map.</p>
+				 <p></p>
+				 
                  <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
              </div>
 
@@ -334,7 +372,7 @@
 					data-role="button">Menu</a>
                 <h1>Authenticate</h1>
                 <a
-					href="#surveyor-help"
+					href="#login-help"
 					data-rel="popup"
 					data-position-to="window"
 					data-transition="slidedown"
@@ -385,6 +423,14 @@
 							 >Log In</button>
 	                    </li>
 					</ul>
+					<p>
+						Each time you log in we send you an email with a new link to access
+						your personal view of the Ten Breaths Map.
+					</p>
+					<p>
+						You will remain logged in on this device until you log out by tapping 
+						your display name in the menu.
+					</p>
 				</div>
 				
 				<!-- Forgot Password -->
@@ -416,9 +462,15 @@
 							<button
 								id="forgot-button"
 								class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-right"
-							>Reset Password</button>
+							>Update Password</button>
 	                    </li>
 					</ul>
+					
+					<p>
+						The new password you provide will not become active until you
+						respond to an email we will send to you.
+					</p>
+					
 				</div>
 				
 				
@@ -464,6 +516,14 @@
 							>Sign Up</button>
 	                    </li>
 					</ul>
+					<p>
+							Your <strong>email</strong> and <strong>password</strong> will be used for administrative purposes
+							only and will not be shared with anyone else. 
+					</p>
+					<p>
+							The <strong>display name</strong> you provide will be shown on contributions you flag as public and in the data 
+							provided to researchers.
+					</p>
 				</div>
 				
 			</div><!-- end content -->
@@ -482,6 +542,16 @@
 					>OK</a>
                 </div>
             </div>
+			
+		 	<!-- login Help -->
+            <div data-role="popup" id="login-help" data-overlay-theme="b"  data-theme="a" data-dismissible="false" >
+			 <div role="main" class="ui-content">
+                 <h3>Authentication Help</h3>
+				 <p>This is help about authentication.</p>
+                	 <p>&nbsp;</p>	
+				 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+			  </div>
+            </div>
 
 		</div><!-- end auth page -->
 		        
@@ -498,7 +568,68 @@
         	</div><!-- /header -->
 
         	<div role="main" class="ui-content">
-        		<p>This explains about the project and links out to other stuff...</p>
+				<h2>Ten Breaths Map</h2>
+        		<p>
+					We all have special moments of connection with nature.
+					This app helps to enrich those moments and share
+				 	when and where they occur.
+  			    </p>
+				<p>
+					By combining information about the places people find restorative
+					with data about biodiversity and pollution			
+					we can make better planning decisions and collectively
+					build a better future.
+				</p>
+				<p>
+					Using the app involves a simple mindfulness exercise that
+					deepens our experience and
+					can lead to a heightened enjoyment of nature.
+				</p>
+				<h3>Getting Started</h3>
+				<p>
+					The best way to start is to watch the video tutorial accessible via the menu.
+					You need a network connection for this.
+				</p>
+				<p>
+					If you would like to jump straight in then the help page available
+					on the "Take Ten Breaths" screen may be enough. 
+				</p>
+				<h3>Signing Up</h3>
+				<p>
+					You can do the Ten Breaths exercise without signing 
+					up to anything but if you do sign up you can
+					contribute to our research into the relationships between human 
+					well-being and nature and,
+					if you like,
+					share your contributions with others.
+				</p>
+				<p>
+					You only need an active email address to take part.
+				</p>
+				<p>
+					Once you have signed up the time and place of your exercises will be
+					plotted on the Ten Breaths Map. You can choose whether individual 
+					contributions are public or hidden and so only available to yourself and
+					trusted researchers.
+				</p>
+				<h2>About Us</h2>
+				<p>
+					The Ten Breaths Map is being coordinated by the Royal Botanic Garden
+					Edinburgh as part of our contribution to ...
+				</p>
+				<p>
+					Although the first projects involve the city of Edinburgh the map
+					covers the entire globe and could be used for projects, campaigns or
+					fun anywhere. The software is open source and we intend to keep the data
+					as open as we can without compromising contributors' privacy. If you have project
+					ideas please get in touch and we will do what we can to support and partner with you.
+				</p>
+				<h2>Contact Us</h2>
+				<p>
+					If you have any questions or concerns please contact Roger Hyam by email (using the feedback option on the menu),
+					by post at Royal Botanic Garden Edinburgh, 20A Inverleith Row, Edinburgh, EH3 5LR, UK or by telephone on
+					<a href="tel:+445527171" >+44 (0) 552 7171</a>.
+				</p>
         	</div><!-- /content -->
 
         </div><!-- /page -->
