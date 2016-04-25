@@ -50,6 +50,10 @@
 	width: 100%;
 }
 
+#ten-breaths-text{
+    height: 100px !important;
+}
+
 
 /* red icon #c20000 */
 #ten-breaths-save:after {
@@ -88,4 +92,18 @@
 #ten-breaths-hidden span.sy-prefers-hidden,
 #ten-breaths-photo span.sy-has-photo{
 	display:none;
+}
+
+#about img{
+    width: 100%;
+    max-width: 450px;
+    border-radius: 3px;
+}
+
+#rbge-logo{
+    border: solid 1px #375d48;
+}
+
+#ell-logo{
+    border: solid 1px #9cd354;
 }

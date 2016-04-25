@@ -1,49 +1,26 @@
 
-TODO
-====
+TERMINOLOGY
+===========
 
-* Submissions with user id rather than user object.
-* Lost password function - email?
-* Check help popup works on each screen 
-* about page initial text
-* standardise vocabulary on UI. Are we talking survey/measure/session/ten breaths what?
+This is from the user perspective. The code may still use confusing terminology.
 
-Minor
------
-
-* display of thumbnails in list items has margin at bottom.
-
-
-Before App Store
-================
-
-* Make the movie?
-* Colour me beautiful.
+* __Session__ = Counting ten breaths whilst focussed on an object
+* __Survey__ = A session tagged with a GPS coordinate and possibly a photo and text
+* __The Map__ = Anything server side
 
 Required Plugins
 ================
 
-these versions are wrong for 5 (android 6)
-
-* cordova-plugin-camera 1.2.0 "Camera"
-* cordova-plugin-device-motion 1.1.1 "Device Motion"
-* cordova-plugin-geolocation 1.0.1 "Geolocation"
-* cordova-plugin-statusbar 1.0.1 "StatusBar"
-* cordova-plugin-vibration 1.2.0 "Vibration"
-* cordova-plugin-whitelist 1.0.0 "Whitelist"
-* cordova-plugin-file-transfer 1.2.1 "File Transfer"
-
-With dev versions
-
-cordova-plugin-camera 2.0.1-dev "Camera"
-cordova-plugin-device-motion 1.2.0 "Device Motion"
-cordova-plugin-file 4.0.1-dev "File"
-cordova-plugin-file-transfer 1.4.1-dev "File Transfer"
-cordova-plugin-geolocation 2.0.1-dev "Geolocation"
-cordova-plugin-vibration 2.0.0 "Vibration"
-cordova-plugin-whitelist 1.2.0 "Whitelist"
-
-cordova plugin add cordova-plugin-appversion
+cordova-plugin-appversion 1.0.0 "App Version"
+cordova-plugin-camera 2.2.0 "Camera"
+cordova-plugin-compat 1.0.0 "Compat"
+cordova-plugin-device-motion 1.2.1 "Device Motion"
+cordova-plugin-file 4.2.0 "File"
+cordova-plugin-file-transfer 1.5.1 "File Transfer"
+cordova-plugin-geolocation 2.2.0 "Geolocation"
+cordova-plugin-statusbar 1.0.1 "StatusBar"
+cordova-plugin-vibration 2.1.1 "Vibration"
+cordova-plugin-whitelist 1.2.2 "Whitelist"
 
 Version 2
 =========

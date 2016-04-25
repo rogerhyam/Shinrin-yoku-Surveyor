@@ -19,20 +19,25 @@ shinrinyoku.max_breaths_duration_default = 90;
 shinrinyoku.min_breaths_duration_developer = 1;
 shinrinyoku.max_breaths_duration_developer = 10;
 
+// do not default to automatically submitting results
+shinrinyoku.autosave = false;
+
 shinrinyoku.setSubmitToLive = function(goLive){
 	
 	console.log("golive = " + goLive);
 	
 	if(goLive){
-		console.log("submitting to live");
-		shinrinyoku.submit_live = true;
-		shinrinyoku.submit_uri = shinrinyoku.submit_uri_live + '/submit/index.php';
-		shinrinyoku.map_uri = shinrinyoku.submit_uri_live + "/index.php";
+        console.log("submitting to live");
+        shinrinyoku.submit_live = true;
+        shinrinyoku.submit_uri = shinrinyoku.submit_uri_live + '/submit/index.php';
+        shinrinyoku.map_uri = shinrinyoku.submit_uri_live + "/index.php";
+        shinrinyoku.video_uri = shinrinyoku.submit_uri_live + "/video.php";
 	}else{
-		console.log("submitting to dev");
-		shinrinyoku.submit_live = false;
-		shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev + '/submit/index.php';
-		shinrinyoku.map_uri = shinrinyoku.submit_uri_dev + "/index.php";
+        console.log("submitting to dev");
+        shinrinyoku.submit_live = false;
+        shinrinyoku.submit_uri = shinrinyoku.submit_uri_dev + '/submit/index.php';
+        shinrinyoku.map_uri = shinrinyoku.submit_uri_dev + "/index.php";
+        shinrinyoku.video_uri = shinrinyoku.submit_uri_dev + "/video.php";
 	}
 	
 	 // display the current values
@@ -127,7 +132,7 @@ shinrinyoku.onMoveSuccess = function(acceleration){
 			// quit on count of 20 turns quit
 			// give a blip of vibration as haptic feedback
 			if(breath_count > 20){
-                if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
+                if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100]);
 				shinrinyoku.stopBreathing();
 			}else{
 				if(navigator.vibrate) navigator.vibrate([100]);
@@ -255,13 +260,13 @@ shinrinyoku.submit = function(survey_ids, silent){
                 // move from the out to history boxes
                 for(var j=0; j < outbox.length; j++){
                     if(outbox[j].id == survey_id){
-						
-						// add it to the front of the history so they appear decending
+
+                        // add it to the front of the history so they appear decending
                         history.unshift(outbox[j]); 
-						
-						// truncate the history at 30
-						if(history.length > 30) history = history.slice(0,29);
-						
+
+                        // truncate the history at 30
+                        if(history.length > 30) history = history.slice(0,29);
+
                         outbox.splice(j, 1);
                         break;
                     }
@@ -372,11 +377,9 @@ shinrinyoku.startBreathing = function(){
                 
                 $('#survey-grounding-slow').popup('open');
                 
-                //$('#ten-breaths-finished').addClass('ui-disabled');
-                //$('#ten-breaths-start').text("Start");
                 shinrinyoku.ten_breaths_running = false;
-				shinrinyoku.setDisplayReady();
-				
+                shinrinyoku.setDisplayReady();
+                
                 if(navigator.vibrate){
                     navigator.vibrate([300,500,300]);
                 }
@@ -405,9 +408,9 @@ shinrinyoku.stopBreathing = function(){
              clearTimeout(shinrinyoku.grounding_timer);
              shinrinyoku.grounding_timer = false;
          }
-		 
-		 // stop listening to the phone movement
-		 shinrinyoku.stopMove();
+
+         // stop listening to the phone movement
+         shinrinyoku.stopMove();
          
          var d = new Date();
          var session = sysurvey.groundings[sysurvey.groundings.length - 1];
@@ -448,13 +451,28 @@ shinrinyoku.stopBreathing = function(){
 			 // if we aren't logged in then we drop the survey and 
 			 // reset to start again
 			 if( window.localStorage.getItem('user_key')){
-			 	 shinrinyoku.setDisplayCompleted();
-			 }else{
-				 shinrinyoku.resetSurvey();
-				 $('#survey-grounding-not-logged-in').popup('open');
-			 }
-			 
-			 
+                 
+                 // if they are autosaving then trigger the save and reset the display
+                 // otherwise set the display to completed so they can add a photo
+                 // and then save 
+                if(shinrinyoku.prefersAutosave()){
+                    
+                    shinrinyoku.saveSurvey(false);
+                    shinrinyoku.setDisplayReady();
+                    
+                    // and extra buzz so they don't have to look down at their phone
+                    if(navigator.vibrate) navigator.vibrate([400]);
+                    
+                }else{
+                    shinrinyoku.setDisplayCompleted();
+                }
+
+            }else{
+             shinrinyoku.resetSurvey();
+             $('#survey-grounding-not-logged-in').popup('open');
+            }
+
+
          }
 }
 
@@ -546,6 +564,9 @@ shinrinyoku.setDisplayReady = function(){
 	// hidden/public button is set to whatever they prefer
 	shinrinyoku.setPrefersPublic(shinrinyoku.prefersPublic());
 	
+	// autosave state
+	shinrinyoku.setPrefersAutosave(shinrinyoku.prefersAutosave());
+	
 }
 
 shinrinyoku.setDisplayBreathing = function(){	
@@ -597,13 +618,83 @@ shinrinyoku.setPrefersPublic = function(prefers){
 	window.localStorage.setItem('prefers-public', JSON.stringify(prefers));
 	if(prefers){
 		$('#ten-breaths-hidden').removeClass('sy-alert');
-		//$('.sy-prefers-public').show();
-		//$('.sy-prefers-hidden').hide();
 	}else{
 		$('#ten-breaths-hidden').addClass('sy-alert');
-		//$('.sy-prefers-public').hide();
-		//$('.sy-prefers-hidden').show();
 	}
+}
+
+shinrinyoku.prefersAutosave = function(){
+	var prefers = window.localStorage.getItem('prefers-autosave');
+	if(prefers == null){
+		window.localStorage.setItem('prefers-autosave', JSON.stringify(false));
+		return false;
+	}else{
+		return JSON.parse(prefers);
+	}
+}
+
+shinrinyoku.setPrefersAutosave = function(prefers){
+	window.localStorage.setItem('prefers-autosave', JSON.stringify(prefers));
+	if(prefers){
+	    $('.ten-breaths-manual-save').hide('slow');
+	    $('.ten-breaths-autosave').show('slow');
+	    $('#ten-breaths-autosave').addClass('ui-icon-check');
+	    $('#ten-breaths-autosave').removeClass('ui-icon-delete');
+	}else{
+	    $('.ten-breaths-manual-save').show('slow');
+	    $('.ten-breaths-autosave').hide('slow');
+	    $('#ten-breaths-autosave').removeClass('ui-icon-check');
+	    $('#ten-breaths-autosave').addClass('ui-icon-delete');
+	}
+}
+
+
+shinrinyoku.saveSurvey = function(sayThanks){
+
+     // double check the gps is stopped
+     shinrinyoku.stopGps();
+
+     // save the survey - 
+     var now = new Date();
+     sysurvey.completed = now.getTime();
+	 sysurvey.public = shinrinyoku.prefersPublic()? 1 : 0;
+     sysurvey.timezoneOffset = now.getTimezoneOffset();
+     // not sure if daylight saving is always included...
+     
+     // add the state of how it was saved
+     sysurvey.autosave = shinrinyoku.prefersAutosave();
+     
+     // values on the form 
+     sysurvey.textComments = $('#ten-breaths-text').val();
+     
+     // add it to the outbox
+     var outbox = shinrinyoku.getBox('outbox');
+     outbox.push(sysurvey);
+     shinrinyoku.saveBox('outbox', outbox);
+
+     // attempt silent upload of latest survey
+    setTimeout(function(){
+        
+        // the survey will have disappeared so we have to fetch it from the
+        // outbox again
+        var outbox = shinrinyoku.getBox('outbox');
+        if(outbox.length > 0){
+            var togo = outbox[outbox.length -1];
+            shinrinyoku.submit([togo.id], true);
+        }
+    
+    }, 0);
+    
+    // say thankyou.
+    if(sayThanks){
+        setTimeout(function(){
+           $('#ten-breaths-thanks-popup').popup('open');
+        }, 100);        
+    }
+    
+    // reset the sysurvey for the next one
+    shinrinyoku.resetSurvey();
+    
 }
 
 /*
@@ -638,16 +729,19 @@ function ShinrinYokuSurvey(){
         var now = new Date();
         this.started = now.getTime();
 
-        // find the location
-        shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
-            shinrinyoku.onGeoSuccess,
-            shinrinyoku.onGeoError,
-            {
-                enableHighAccuracy: true, 
-                maximumAge        : 10 * 1000, 
-                timeout           : 10 * 1000
-            }
-            );
+        // find the location - if they are logged in
+        if(window.localStorage.getItem('user_key')){
+             shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
+                    shinrinyoku.onGeoSuccess,
+                    shinrinyoku.onGeoError,
+                    {
+                        enableHighAccuracy: true, 
+                        maximumAge        : 10 * 1000, 
+                        timeout           : 10 * 1000
+                    }
+                    );
+        }
+       
 
         // set a timeout to clear the watch handler after 2 minutes no matter what - we don't want to flatten their battery
         setTimeout(shinrinyoku.stopGps, 1000 * 60 * 2 );
@@ -723,13 +817,21 @@ $( function() {
 		 if(accessToken){
 			 mapUri = mapUri + '?t=' + accessToken;
 		 }
-		// if we have a user access key we add it to the 
-	 	 window.open(mapUri, '_system');
+		// if we have a user access key we add it to the
+		$('#menu-map-link').blur();
+        window.open(mapUri, '_system');
 		 
 	 });
 	 
+	 $('#video-tutorial-link').on('click', function(){
+	     $('#video-tutorial-link').blur();
+         window.open(shinrinyoku.video_uri, '_system');
+	 });
+	 
+	 
 	 $('#menu-feedback-link').on('click', function(){
 		 var subject = encodeURIComponent('Ten Breaths Map: Feedback');
+		 $('#menu-feedback-link').blur();
 	 	 window.open('mailto:' + shinrinyoku.feedback_address + '?subject=' + subject);
 	 }); 
 	 
@@ -849,47 +951,14 @@ $(document).on('pagecreate', '#ten-breaths', function(e, data) {
          
      });
      
+     
      $('#ten-breaths-save, #ten-breaths-popup-save').on('click', function(){
-
-         // double check the gps is stopped
-         shinrinyoku.stopGps();
-
-         // save the survey - 
-         var now = new Date();
-         sysurvey.completed = now.getTime();
-		 sysurvey.public = shinrinyoku.prefersPublic()? 1 : 0;
-         sysurvey.timezoneOffset = now.getTimezoneOffset();
-         // not sure if daylight saving is always included...
-         
-         // values on the form 
-         sysurvey.textComments = $('#ten-breaths-text').val();
-         
-         // add it to the outbox
-         var outbox = shinrinyoku.getBox('outbox');
-         outbox.push(sysurvey);
-         shinrinyoku.saveBox('outbox', outbox);
-
-         // attempt silent upload of latest survey
-        setTimeout(function(){
-            
-            // the survey will have disappeared so we have to fetch it from the
-            // outbox again
-            var outbox = shinrinyoku.getBox('outbox');
-            if(outbox.length > 0){
-                var togo = outbox[outbox.length -1];
-                shinrinyoku.submit([togo.id], true);
-            }
-        
-        }, 0);
-        
-        // say thankyou.
-         setTimeout(function(){
-            $('#ten-breaths-thanks-popup').popup('open');
-         }, 100);
-         
-         // reset the sysurvey for the next one
-         shinrinyoku.resetSurvey();
-        
+         shinrinyoku.saveSurvey(true);
+     });
+     
+     $('#ten-breaths-autosave').on('click', function(){
+         shinrinyoku.setPrefersAutosave(!shinrinyoku.prefersAutosave()); 
+         $('#ten-breaths-autosave').blur();
      });
 	 
 	 // the first run popup closure

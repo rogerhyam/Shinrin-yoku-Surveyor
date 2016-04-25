@@ -84,7 +84,7 @@
                     </li>
 
                     <li data-icon="action" >
-                     <a href="#">
+                     <a id="video-tutorial-link" href="#">
                          <h2>Video Tutorial</h2>
                      </a>
                     </li>
@@ -161,7 +161,7 @@
 				</div>
 				
 				<!-- input a comment -->
-				<div class="ui-grid-solo">
+				<div class="ui-grid-solo ten-breaths-manual-save">
 					<div class="ui-block-a">
 						<textarea
 							cols="40"
@@ -173,8 +173,7 @@
 				</div>
 				
 				<!-- The button grid -->
-				<div class="ui-grid-a" id="sy-button-grid" >
-
+				<div class="ui-grid-a  ten-breaths-manual-save" id="sy-button-grid" >
 				    <div class="ui-block-a">
 						<button
 							id="ten-breaths-hidden"
@@ -204,6 +203,19 @@
 							id="ten-breaths-save"
 							class="ui-btn ui-corner-all ui-btn-a ui-icon-check ui-btn-icon-top"
 						>Save</button>
+					</div>
+				</div>
+				
+				<!-- display the Auto Save button if logged in -->
+				<div class="ui-grid-solo sy-user-logged-in">
+					<div class="ui-block-a">
+					    <button
+							id="ten-breaths-autosave"
+							class="ui-btn ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-right"
+						>
+						    <span class='ten-breaths-manual-save' >Autosave is off</span>
+						    <span class='ten-breaths-autosave' >Autosave is on</span>
+						</button>
 					</div>
 				</div>
 				
@@ -356,10 +368,15 @@
 					 After ten breaths the phone will give two longer buzzes to show you have finished the cycle.
 					 If you like you can carry on breathing and enjoying the object. Perhaps silently giving thanks.
 				 </p>
-				 <p>If you are logged in then you can add a few words and a photo before saving your session to the map.</p>
+				 <p>If you are logged in then you can add a few words and a photo before saving your session to the map as a survey point.</p>
+				 <p>
+				     For more advanced use, and less distraction, you can turn on <strong>autosave</strong> and sessions will be saved without
+				     prompting for text or a photo and defaulting to the last privacy setting.
+				     It is probably best to save a few manually before you try this.
+				 </p>
 				 <p></p>
 				 
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
              </div>
 
         </div><!-- ten breaths page -->
@@ -550,9 +567,23 @@
             <div data-role="popup" id="login-help" data-overlay-theme="b"  data-theme="a" data-dismissible="false" >
 			 <div role="main" class="ui-content">
                  <h3>Authentication Help</h3>
-				 <p>This is help about authentication.</p>
+				 <p>This screen has three tabs along the top.</p>
+				 <p><strong>Log In: </strong>
+				     If you have already signed up then you can log in using your email address and password.
+				     You must be logged in to record the location of your sessions.
+				 </p>
+				 <p><strong>Sign Up: </strong>
+				     To contribute to the map you need to create an account by signing up.
+				     To do this you must have a functioning email account and pick a display name that you will be know as by other users.
+				     Once you have signed up you will be sent an email to confirm your address and fully activate the account.
+				 </p>
+				 <p><strong>Forgot: </strong>
+				    If you forget your password you can create a new one using this tab.
+				    The new password only becomes active once the link in the email has been ticked. 
+				    If you remember your old password you can continue using that and just delete the password activation email.
+				 </p>
                 	 <p>&nbsp;</p>	
-				 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+				 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
 			  </div>
             </div>
 
@@ -617,6 +648,9 @@
 				</p>
 				<h2>About Us</h2>
 				<p>
+				    <img id="rbge-logo" src="images/rbge_logo.jpg"/>
+				</p>
+				<p>
 					The Ten Breaths Map is being coordinated by the 
 					<a href="http://www.rbge.org.uk">Royal Botanic Garden Edinburgh</a>
 					as part of our contribution to the Edinburgh Living Landscape and
@@ -628,6 +662,9 @@
 					<strong>Priority Project 5:</strong> <em>More People Experiencing and Enjoying Nature</em>
 					and
 					<strong>Priority Project 7:</strong> <em>Developing Scotland’s Natural Health Service</em>.
+				</p>
+				<p>
+				    <img id="ell-logo" src="images/ell_logo.jpg"/>
 				</p>
 				<p>
 					Although these first projects concern Edinburgh and Scotland the map
@@ -721,7 +758,7 @@
    				  	 <p>Either tap a survey to submit it or tap the 'Submit All' button at the bottom of the screen.</p>
                      <p>You can also delete surveys one at a time if you don't want to submit them.</p>
                  	 <p>&nbsp;</p>	
-					 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+					 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
 				  </div>
              </div>
 
@@ -766,7 +803,7 @@
                  <p>These are the surveys submitted from this device up to a maximum of the last thirty.</p>
                  <p>Tap a survey to display it on the map. You need a network connection to do this.</p>
                  <p>If you log out this list will be emptied but the surveys will remain on the map.</p>
-                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">Got it!</a>
+                 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
              </div><!-- end history help -->
 			 
         </div><!-- end page -->
