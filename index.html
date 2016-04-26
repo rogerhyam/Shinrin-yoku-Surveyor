@@ -716,14 +716,6 @@
                 </ul>
              </div><!-- end content -->
 
-             <div data-role="footer" data-position="fixed" >
-                 <a
-				 	href="#"
-					id="submit-all"
-					class="ui-btn ui-corner-all ui-btn-inline ui-mini footer-button ui-btn-icon-right ui-icon-action"
-				 >Submit All</a>
-             </div>
-
 			 <!-- No Network popup -->
              <div data-role="popup" id="outbox-no-net" data-overlay-theme="b" data-theme="a" data-dismissible="false" >
                  <div role="main" class="ui-content">
@@ -755,8 +747,7 @@
 	                 <h3>Outbox Help</h3>
 	                 <p>These are the surveys you have done but that haven't been submitted yet.</p>
                  	 <p>When you have an internet connection you can submit them to the server either one at a time or all together.</p>
-   				  	 <p>Either tap a survey to submit it or tap the 'Submit All' button at the bottom of the screen.</p>
-                     <p>You can also delete surveys one at a time if you don't want to submit them.</p>
+   				  	 <p>Tap a survey to submit it or tap the delete button if you don't want to submit it.</p>
                  	 <p>&nbsp;</p>	
 					 <a href="#" class="ui-btn ui-corner-all ui-shadow" data-rel="back">OK</a>
 				  </div>
@@ -797,7 +788,7 @@
 
              </div><!-- end content -->
              
-			 <!-- History Help -->
+             <!-- History Help -->
              <div data-role="popup" id="history-help" data-dismissible="false" data-theme="a" class="ui-content ui-corner-all">
                  <h3>Recent Surveys</h3>
                  <p>These are the surveys submitted from this device up to a maximum of the last thirty.</p>
@@ -830,10 +821,6 @@
                 <ul data-role="listview" data-inset="true" >
                     <li data-role="list-divider">Settings</li>
                     <li class="ui-field-contain">
-                        <label for="developer-mode">Developer Mode</label>
-                        <input name="developer-mode" id="developer-mode" value="" type="checkbox">
-                    </li>
-                    <li class="ui-field-contain">
                         <label for="developer-submit-uri-live">Submit to LIVE</label>
                         <input name="developer-submit-uri" id="developer-submit-uri-live" type="radio" value="live" >
                         <label for="developer-submit-uri-dev">Submit to DEV</label>
@@ -842,15 +829,12 @@
                     <li class="ui-field-contain">
                         <button id="developer-save-button">Save</button>
                     </li>
-					<li>
-						<p id="developer-show-mode"></p>
-					</li>
-					<li>
-						<p id="developer-show-map-uri"></p>
-					</li>
-					<li>
-						<p id="developer-show-submit-uri"></p>
-					</li>
+                    <li>
+                        <p id="developer-show-map-uri"></p>
+                    </li>
+                    <li>
+                        <p id="developer-show-submit-uri"></p>
+                    </li>
                 </ul>
             
             </div><!-- /content -->
