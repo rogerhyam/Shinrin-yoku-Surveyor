@@ -1257,8 +1257,14 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
         a1.append(shinrinyoku.getThumbnail(survey));
                 
         var h3 = $('<h3></h3>');
+        
+        // chop the timezone stuff off the date
         var d = new Date(survey.started);
-        h3.html(d.toString(''));
+        var longDate = d.toString();
+        var matches = longDate.match(/^(.*) GMT/);
+        if(matches.length > 1) h3.html(matches[1]);
+        else h3.html(longDate);
+        
         a1.append(h3);
         
         var p = $('<p></p>');
@@ -1336,7 +1342,10 @@ $(document).on('pagebeforeshow', '#outbox', function(e, data) {
          
          var h3 = $('<h3></h3>');
          var d = new Date(survey.started);
-         h3.html(d.toString(''));
+         var longDate = d.toString();
+         var matches = longDate.match(/^(.*) GMT/);
+         if(matches.length > 1) h3.html(matches[1]);
+         else h3.html(longDate);
          a1.append(h3);
 
          var p = $('<p></p>');
