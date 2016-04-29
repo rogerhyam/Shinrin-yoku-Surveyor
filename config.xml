@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="uk.org.rbge.hyam.shinrinyoku.surveyor" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Ten Breaths Mapper</name>
+<widget id="uk.org.rbge.hyam.tenbreathsmap" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Ten Breaths Map</name>
     <description>
         Places that nourish. Places that heal.
     </description>
@@ -25,6 +25,11 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    
+    <allow-navigation href="http://tenbreaths.rbge.info/*" />
+    <allow-navigation href="http://www.rbge.org.uk/*" />
+    <allow-navigation href="http://www.gov.scot/*" />
+    <allow-navigation href="mailto:*" />
 	
     <platform name="android">
 		
@@ -57,7 +62,6 @@
           <allow-intent href="itms-apps:*" />
 
           <!-- icons - I don't believe it!! -->
-          <icon src="res/ios/icon.png" />
           <icon src="res/ios/icon-60@3x.png" width="180" height="180" />
           <icon src="res/ios/icon-60.png" width="60" height="60" />
           <icon src="res/ios/icon-60@2x.png" width="120" height="120" />

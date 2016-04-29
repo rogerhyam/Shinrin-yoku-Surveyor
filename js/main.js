@@ -78,7 +78,10 @@ shinrinyoku.onGeoSuccess = function(position){
     sysurvey.geolocation.altitudeAccuracy = position.coords.altitudeAccuracy;
     sysurvey.geolocation.heading = position.coords.heading;    
     sysurvey.geolocation.timestamp = position.timestamp;
-
+    
+    // if we have had a success clear earlier errors
+    shinrinyoku.onGeoError = false;
+    
 }
 
 shinrinyoku.onGeoError = function(error){
@@ -124,10 +127,12 @@ shinrinyoku.onMoveSuccess = function(acceleration){
             // quit on count of 20 turns quit
             // give a blip of vibration as haptic feedback
             if(breath_count > 20){
-                if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100]);
+                shinrinyoku.vibrate(2, false);
+                //if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100]);
                 shinrinyoku.stopBreathing();
             }else{
-                if(navigator.vibrate) navigator.vibrate([100]);
+                shinrinyoku.vibrate(1, false);
+                // if(navigator.vibrate) navigator.vibrate([100]);
             }
         
         }
@@ -313,8 +318,9 @@ shinrinyoku.submit = function(survey_id, silent){
 shinrinyoku.startBreathing = function(){
          
         // haptic feedback on this button
-        if(navigator.vibrate) navigator.vibrate([20]);
-         
+        //if(navigator.vibrate) navigator.vibrate([20]);
+        shinrinyoku.vibrate(1, true);
+        
          var d = new Date();
          
          // if we are already running then cancel and return
@@ -345,7 +351,8 @@ shinrinyoku.startBreathing = function(){
                 shinrinyoku.setDisplayReady();
                 
                 if(navigator.vibrate){
-                    navigator.vibrate([300,500,300]);
+                    //navigator.vibrate([300,500,300]);
+                    shinrinyoku.vibrate(1, false);
                 }
                 
                 // we should have got their position by now
@@ -424,7 +431,8 @@ shinrinyoku.stopBreathing = function(){
                     shinrinyoku.setDisplayReady();
                     
                     // and extra buzz so they don't have to look down at their phone
-                    if(navigator.vibrate) navigator.vibrate([400]);
+                    // if(navigator.vibrate) navigator.vibrate([400]);
+                    shinrinyoku.vibrate(1, false);
                     
                 }else{
                     shinrinyoku.setDisplayCompleted();
@@ -665,6 +673,30 @@ shinrinyoku.saveSurvey = function(sayThanks){
     
 }
 
+shinrinyoku.vibrate = function(times, shorter){
+    
+    // do nothing if we don't have a vibrator
+    if(!navigator.vibrate) return;
+    
+    // choose how long we will vibrate
+    var duration = 100;
+    if(shorter) duration = 20;
+        
+    // do the first vibrations
+    navigator.vibrate(duration);
+    
+    var remaining = times -1;
+    
+    if(remaining > 0){
+        setTimeout(function(){
+            shinrinyoku.vibrate(remaining, shorter);
+        }, 500);
+    }
+    
+}
+
+
+
 /*
  * The survey object class
  */
@@ -705,7 +737,7 @@ function ShinrinYokuSurvey(){
                     {
                         enableHighAccuracy: true, 
                         maximumAge        : 10 * 1000, 
-                        timeout           : 10 * 1000
+                        timeout           : 30 * 1000
                     }
                     );
         }
