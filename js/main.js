@@ -829,11 +829,17 @@ $( function() {
      });
      
      
+     // mailto link is set in the html as calling window.open is unreliable
+     var subject = encodeURIComponent('Ten Breaths Map: Feedback');
+     $('#menu-feedback-link').attr('href', 'mailto:' + shinrinyoku.feedback_address + '?subject=' + subject);
+     
      $('#menu-feedback-link').on('click', function(){
-         var subject = encodeURIComponent('Ten Breaths Map: Feedback');
+         //var subject = encodeURIComponent('Ten Breaths Map: Feedback');
          $('#menu-feedback-link').blur();
-          window.open('mailto:' + shinrinyoku.feedback_address + '?subject=' + subject);
-     }); 
+         //window.open('mailto:' + shinrinyoku.feedback_address + '?subject=' + subject);
+     });
+     
+      
      
 });
  

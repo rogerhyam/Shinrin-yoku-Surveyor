@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="uk.org.rbge.hyam.tenbreathsmap" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="uk.org.rbge.hyam.tenbreathsmap" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Ten Breaths Map</name>
     <description>
         Places that nourish. Places that heal.
@@ -18,7 +18,10 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     
     <plugin name="cordova-plugin-whitelist" version="1" />
+    
     <access origin="*" />
+   <!-- <access origin="mailto:*" launch-external="yes"/> -->
+    
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -26,10 +29,12 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     
+    <!--
     <allow-navigation href="http://tenbreaths.rbge.info/*" />
     <allow-navigation href="http://www.rbge.org.uk/*" />
     <allow-navigation href="http://www.gov.scot/*" />
     <allow-navigation href="mailto:*" />
+	-->
 	
     <platform name="android">
 		
