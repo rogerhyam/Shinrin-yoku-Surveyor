@@ -53,6 +53,9 @@ shinrinyoku.onGeoSuccess = function(position){
     // if survey is null they have given up
     if(!sysurvey) return;
     
+    // cancel the error we set when we started out
+    sysurvey.geolocation.error = false;
+    
     // make a human friendly string
     if(position.coords.latitude > 0){
         var lat = position.coords.latitude.toFixed(4) + '&deg; N';
@@ -80,7 +83,7 @@ shinrinyoku.onGeoSuccess = function(position){
     sysurvey.geolocation.timestamp = position.timestamp;
     
     // if we have had a success clear earlier errors
-    shinrinyoku.onGeoError = false;
+    sysurvey.geolocation.error = false;
     
 }
 
@@ -203,6 +206,13 @@ shinrinyoku.resetSurvey = function(){
     shinrinyoku.min_breaths_duration = shinrinyoku.min_breaths_duration_default;
     shinrinyoku.max_breaths_duration = shinrinyoku.max_breaths_duration_default;
     shinrinyoku.setDisplayReady();
+    
+    // clear the timer if it is still running
+    clearTimeout(shinrinyoku.grounding_timer);
+    shinrinyoku.grounding_timer = false;
+    
+    shinrinyoku.stopGps(); // stop the gps running
+    shinrinyoku.stopMove(); // stop listening to phone movements
 
 }
 
@@ -325,13 +335,17 @@ shinrinyoku.startBreathing = function(){
          
          // if we are already running then cancel and return
          if(shinrinyoku.grounding_timer){
+                shinrinyoku.resetSurvey();
+                return;
+                /*
                 sysurvey.groundings[sysurvey.groundings.length - 1].cancelled = d.getTime();
                 //$('#ten-breaths-finished').addClass('ui-disabled');
                 shinrinyoku.setDisplayReady();
                 clearTimeout(shinrinyoku.grounding_timer);
                 shinrinyoku.grounding_timer = false;
+                shinrinyoku.stopGps() // stop the gps running
                 shinrinyoku.stopMove();
-                return;
+                */
          }
          
          // Start them off
@@ -406,6 +420,7 @@ shinrinyoku.stopBreathing = function(){
              $('#survey-grounding-fast').popup('open');   
              // $('#ten-breaths-finished').addClass('ui-disabled');
              // $('#ten-breaths-start').text("Start");
+             shinrinyoku.stopGps();
              shinrinyoku.setDisplayReady();
          }else if(sysurvey.geolocation.error){
              // this is unlikely so just use system alert box.
@@ -442,7 +457,6 @@ shinrinyoku.stopBreathing = function(){
              shinrinyoku.resetSurvey();
              $('#survey-grounding-not-logged-in').popup('open');
             }
-
 
          }
 }
@@ -719,7 +733,7 @@ function ShinrinYokuSurvey(){
     }
     
     this.ten_breaths_completed = false; // flag that they succeeded in 10 breaths
-    this.complete = false; // time they finished survey and clicked save
+    this.completed = false; // time they finished survey and clicked save
     this.groundings = new Array();
     this.geolocation = new Object();
     
@@ -728,21 +742,24 @@ function ShinrinYokuSurvey(){
         // tag the creation time
         var now = new Date();
         this.started = now.getTime();
-
+        
         // find the location - if they are logged in
         if(window.localStorage.getItem('user_key')){
+            
+            // we set a default error which will be cleared when we get our first response
+            this.geolocation.error = "No location returned";
+            
              shinrinyoku.location_watch_handle = navigator.geolocation.watchPosition(
                     shinrinyoku.onGeoSuccess,
                     shinrinyoku.onGeoError,
                     {
                         enableHighAccuracy: true, 
-                        maximumAge        : 10 * 1000, 
-                        timeout           : 30 * 1000
+                        maximumAge        : 10 * 1000, // happy for position cached in last 10 seconds
+                        timeout           : 30 * 1000 // must return within 30 seconds
                     }
                     );
         }
        
-
         // set a timeout to clear the watch handler after 2 minutes no matter what - we don't want to flatten their battery
         setTimeout(shinrinyoku.stopGps, 1000 * 60 * 2 );
         
